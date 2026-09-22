@@ -1,0 +1,9 @@
+EFG 2 R "Test Game" { "Player 1" } ""
+
+p "A" 1 1 "A infoset" { "a1" "a2" } 0
+  p "B" 1 2 "B infoset" { "b1" "b2" } 0
+    p "C" 1 3 "C infoset" { "c1" "c2" } 0
+      t "A a1 B b1 C c1" 1 "Outcome A a1 B b1 C c1" { 1 }
+      t "A a1 B b1 C c2" 2 "Outcome A a1 B b1 C c2" { 3 }
+    t "A a1 B b2" 3 "Outcome A a1 B b2" { 2 }
+  t "A a2" 4 "Outcome A a2" { 1 }

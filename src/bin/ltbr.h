@@ -72,21 +72,19 @@ inline std::vector<LabeledAdaptiveProfile> ltbr_perturbed_cfr_algs(
           [epsilon](size_t num_players, double utility_diameter) {
             return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
                 hr_edl::BehavioralDeviationTabularCfvLearner<
-                    hr_edl::CounterfactualPartialSequenceExInPredecessors>::NewList(num_players,
-                                                                                    RmUpdate,
-                                                                                    RmLink),
+                    hr_edl::ImmediateExternalSequencePredecessors>::NewList(
+                    num_players, RmUpdate, RmLink),
                 epsilon));
           }},
-        LabeledAdaptiveProfile{
+      LabeledAdaptiveProfile{
           "CFR_IN",
           [epsilon](size_t num_players, double utility_diameter) {
             return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
                 hr_edl::BehavioralDeviationTabularCfvLearner<
-                    hr_edl::TwiceInformedPartialSequencePredecessors>::NewList(num_players,
-                                                                               RmUpdate, RmLink),
+                    hr_edl::ImmediateInternalSequencePredecessors>::NewList(
+                    num_players, RmUpdate, RmLink),
                 epsilon));
           }},
-
   };
 }
 

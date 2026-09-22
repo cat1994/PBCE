@@ -38,6 +38,11 @@ def adaptive_result(algorithms=runner.PBCE_ALGORITHMS, status="MAX_GLOBAL_ITER",
 
 
 class RunnerTests(unittest.TestCase):
+    def test_documented_defaults(self):
+        args = runner.parse_args([])
+        self.assertEqual(args.games, ["kuhn_3p"])
+        self.assertEqual(args.epsilon_decay, 0.5)
+
     def test_modes_and_repeated_games(self):
         for mode, count in (("fixed", 6), ("adaptive", 1), ("both", 7)):
             args = runner.parse_args(["--mode", mode, "--games", "kuhn_2p", "kuhn_2p", "--iterations", "2"])

@@ -46,7 +46,7 @@ def parse_args(argv=None):
     parser.add_argument("--alt", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--cfr-plus", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--epsilon-init", type=float, default=0.1)
-    parser.add_argument("--epsilon-decay", type=float, default=0.75)
+    parser.add_argument("--epsilon-decay", type=float, default=0.5)
     parser.add_argument("--epsilon-min", type=float, default=1e-10)
     parser.add_argument("--stability-window", type=int, default=5)
     parser.add_argument("--stability-tolerance", type=float, default=0.05)

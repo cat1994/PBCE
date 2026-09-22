@@ -15,7 +15,23 @@ Requirements:
 
 The required OpenSpiel source subset, Abseil, and Eigen headers are included. Configuration and compilation do not download dependencies, and the Python launcher uses only the standard library. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for provenance and licenses.
 
-From the repository root:
+From the repository root, use the provided Makefile for incremental builds:
+
+```sh
+make pbce          # Build only the experiment executable.
+make               # Build the executable and test programs.
+make test          # Build and run all tests.
+```
+
+Set `JOBS` to change build parallelism. A separate directory keeps a debug
+configuration independent from the release build:
+
+```sh
+make pbce JOBS=8
+make BUILD_DIR=build-debug BUILD_TYPE=Debug
+```
+
+The Makefile invokes CMake. The equivalent commands are:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -75,9 +91,9 @@ python3 bin/run_all_pbce.py --mode both --games kuhn_2p --dry-run
 python3 bin/run_all_pbce.py --help
 ```
 
-With no options, the launcher selects `random_goofspiel`, both modes, 100,000 iterations, at most six concurrent jobs, one algorithm thread per job, and `build/bin` as the executable directory. Alternate updates and CFR+ truncation are enabled; `--no-alt` and `--no-cfr-plus` disable them.
+With no options, the launcher selects `kuhn_3p`, both modes, 100,000 iterations, at most six concurrent jobs, one algorithm thread per job, and `build/bin` as the executable directory. Alternate updates and CFR+ truncation are enabled; `--no-alt` and `--no-cfr-plus` disable them.
 
-The fixed sweep uses epsilon values `1e-1`, `5e-2`, `1e-2`, `5e-3`, `1e-3`, and `0`. Adaptive defaults include initial epsilon `0.1`, decay `0.75`, minimum epsilon `1e-10`, and checkpoint frequency `50`; `--help` lists the controller options. The C++ runner checks that the chosen epsilon is feasible for the game's action counts.
+The fixed sweep uses epsilon values `1e-1`, `5e-2`, `1e-2`, `5e-3`, `1e-3`, and `0`. Adaptive defaults include initial epsilon `0.1`, decay `0.5`, minimum epsilon `1e-10`, and checkpoint frequency `50`; `--help` lists the controller options. The C++ runner checks that the chosen epsilon is feasible for the game's action counts.
 
 The historical iteration conventions are preserved: fixed mode with `--iterations T` writes `T` records per algorithm, indexed `t = 0, ..., T-1`, with `T-1` learner updates and a final evaluation. Adaptive mode performs at most `T` updates and may terminate earlier. Equal iteration arguments therefore use these respective conventions.
 
@@ -94,17 +110,17 @@ The historical iteration conventions are preserved: fixed mode with `--iteration
 The original configuration's `raise_sizes=[1]` argument was unsupported by this
 OpenSpiel version and prevented the game from loading; it has been removed.
 
-The executable supports the original PBCE algorithm group `3`. Historical output labels and their exact predecessor classes are retained in [src/bin/ltbr.h](src/bin/ltbr.h):
+The executable supports PBCE algorithm group `3`. Its output labels and exact predecessor classes are defined in [src/bin/ltbr.h](src/bin/ltbr.h):
 
 | Output label | Predecessor class |
 | --- | --- |
 | `A-EFR_IN` | `InformedActionSequencePredecessors` |
 | `CSPS-EFR` | `CausalPartialSequencePredecessors` |
 | `CFPS-EFR` | `CounterfactualPartialSequencePredecessors` |
-| `CFR` | `CounterfactualPartialSequenceExInPredecessors` |
-| `CFR_IN` | `TwiceInformedPartialSequencePredecessors` |
+| `CFR` | `ImmediateExternalSequencePredecessors` |
+| `CFR_IN` | `ImmediateInternalSequencePredecessors` |
 
-Each is instantiated through `BehavioralDeviationTabularCfvLearner` and wrapped by `PerturbedCfTreeLearnerProfile`. In particular, interpret `CFR` and `CFR_IN` using the explicit mappings above when comparing results or documenting methods.
+Each is instantiated through `BehavioralDeviationTabularCfvLearner` and wrapped by `PerturbedCfTreeLearnerProfile`. `CFR` uses immediate external deviations, while `CFR_IN` uses immediate internal deviations. These mappings differ from the original extracted snapshot and can change their numerical results; use the table above when comparing runs or documenting methods.
 
 ## Results and completion checks
 

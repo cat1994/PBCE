@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from pbce.experiments import GAME_MAP
 
 ALGORITHMS = {"A-EFR_IN", "CSPS-EFR", "CFPS-EFR", "CFR", "CFR_IN"}
+REFERENCE_ALGORITHMS = ALGORITHMS - {"CFR", "CFR_IN"}
 METRICS = (
     "posr", "osr", "csr", "acsr", "posr_norm", "osr_norm", "csr_norm",
     "w_min", "w_min_positive", "w_mean", "w_max", "w_at_max_csr",
@@ -214,7 +215,7 @@ class PbceSmokeTests(unittest.TestCase):
             with self.subTest(flags=flags):
                 self.run_experiment(flags, success=False)
 
-    def test_optional_reference_numerical_equivalence(self):
+    def test_optional_reference_equivalence_for_unchanged_algorithms(self):
         if REFERENCE_EXE is None:
             self.skipTest("No reference executable supplied")
         for flags in ([], ["--alt=false", "--cfr_plus=false"]):
@@ -224,15 +225,21 @@ class PbceSmokeTests(unittest.TestCase):
                 actual = self.fixed_records(actual_output)
                 expected = self.fixed_records(reference_output)
                 for iteration in actual:
-                    for algorithm in ALGORITHMS:
+                    for algorithm in REFERENCE_ALGORITHMS:
                         for index in (0, 2, 3, 4, 5):
                             self.assert_numerically_equal(
                                 actual[iteration][algorithm][index], expected[iteration][algorithm][index]
                             )
         actual_output, _ = self.run_experiment(ADAPTIVE_FLAGS)
         reference_output, _ = self.run_experiment(ADAPTIVE_FLAGS, executable=REFERENCE_EXE)
-        actual = self.adaptive_records(actual_output)
-        expected = self.adaptive_records(reference_output)
+        actual = [
+            row for row in self.adaptive_records(actual_output)
+            if row["algorithm"] in REFERENCE_ALGORITHMS
+        ]
+        expected = [
+            row for row in self.adaptive_records(reference_output)
+            if row["algorithm"] in REFERENCE_ALGORITHMS
+        ]
         self.assertEqual(len(actual), len(expected))
         for row, reference in zip(actual, expected):
             self.assertEqual(set(row), set(reference))

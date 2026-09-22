@@ -33,7 +33,7 @@ GAME_MAP = {
 }
 
 NUM_ITERATIONS_MAP = dict.fromkeys(GAME_MAP, 100_000)
-DEFAULT_GAMES = ("random_goofspiel",)
+DEFAULT_GAMES = ("kuhn_3p",)
 FIXED_EPSILONS = ("1e-1", "5e-2", "1e-2", "5e-3", "1e-3", "0")
 
 # Keep this set in sync with the PBCE algorithm factory in bin/ltbr.h.

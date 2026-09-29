@@ -2,8 +2,6 @@
 
 This repository contains the code needed to run the fixed-epsilon PBCE experiments and the stagewise adaptive PEFR controller extracted from the original experimental workspace. It includes the C++ runner, its shared learner and evaluation code, the required game implementations, a Python batch launcher, and regression tests.
 
-Intended GitHub publication target: [cat1994/PBCE](https://github.com/cat1994/PBCE).
-
 ## Build and test
 
 Requirements:

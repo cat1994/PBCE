@@ -1,10 +1,6 @@
 # Source and license notices
 
 The original MIT license and copyright notice are preserved in [LICENSE.txt](LICENSE.txt).
-This repository extracts the PBCE experiment from the working tree of
-`cat1994/correlated_eq` at commit `5caf894221c7569ff3cf99b24d5769cfa7004717`,
-including the then-current PBCE launcher changes. It is a source snapshot with
-its own Git history; it does not depend on the original checkout.
 
 The exact source-file SHA-256 values before extraction edits and dependency
 provenance are recorded in [docs/source_manifest.json](docs/source_manifest.json).

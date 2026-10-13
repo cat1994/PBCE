@@ -14,7 +14,7 @@ Author-repository URLs and private revision identifiers are omitted from
 source content. This does not strip identity from Git history or hosting
 metadata; see [GIT_RELEASE.md](GIT_RELEASE.md). Dependency versions and public upstream references remain in
 [source_manifest.json](source_manifest.json), and all mandatory third-party
-notices are retained. `SHA256SUMS` describes the distributed files, not an
-earlier source tree.
+notices are retained. The publication file scope is defined by
+`scripts/release_files.py`.
 
 See [the validation record](../VALIDATION.md) for completed checks.

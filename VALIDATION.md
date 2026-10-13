@@ -7,8 +7,8 @@ This release separates corrected new runs from archived results; see
 ## Current verification results
 
 - Release build and all seven CTest entries passed.
-- All 57 Python checks passed: 19 runner tests, 18 plotting/parser tests and
-  20 Git-preflight tests using isolated temporary repositories.
+- All 61 Python checks passed: 19 runner tests, 18 plotting/parser tests,
+  20 Git-preflight tests and four no-checksum publication-validation tests.
 - All ten five-game figures rendered successfully in PDF, PNG and SVG.
   Their 35 inputs were recognized by hash as the historical archive. Fixed CF
   and adaptive CF-IN previews were visually checked for readable headings,
@@ -16,8 +16,8 @@ This release separates corrected new runs from archived results; see
 - All 30 rendered files passed checks for removal of author, generator and
   timestamp metadata. Plot manifests contain no absolute machine paths.
 - This Git-publication cleanup changes no solver or plot numeric logic.
-  Ten text files were normalized to LF so Git checkouts retain the recorded
-  content hashes; executable permissions were removed from 338 source files.
+  Ten text files were normalized to LF for consistent Git checkouts;
+  executable permissions were removed from 338 source files.
   Data-generation and processing labels remain unchanged.
 
 ## Solver and runner checks
@@ -50,10 +50,11 @@ metadata; those require a separate publication review. The 35 gzip headers have 
 source filename, timestamp, comment or extra fields, and the decompressed
 records were scanned for author identifiers and personal paths.
 
-The package includes SHA-256 checks for its complete source/data inventory.
-All 35 compressed data files must match both their compressed and decompressed
-manifest digests before publication. Run `python3 scripts/verify_release.py --full`
-to additionally parse every fixed record and adaptive checkpoint.
+Publication no longer requires a manually maintained source hash manifest.
+The preflight checks the file inventory, data sizes and gzip readability.
+Historical data digests remain only as provenance for plot-label identification.
+Run `python3 scripts/verify_release.py --full` to additionally parse every
+fixed record and adaptive checkpoint.
 
 ## Historical data selection checks
 
@@ -72,4 +73,4 @@ New figure headings and provenance annotations intentionally change rendered
 PDFs without changing their plotted numbers. See [data documentation](data/README.md)
 and [label mappings](docs/ALGORITHM_LABELS.md).
 
-No public push or release upload is part of this preparation.
+The formal publication branch is `main`.

@@ -93,28 +93,3 @@ New runs default to `outputs/runs/`. Existing outputs are protected, and the
 launcher refuses to write into bundled `data/`. Runtime logs and run metadata
 can contain the executing machine's paths; they are ignored by Git and should
 be reviewed before sharing separately.
-
-## Git publication
-
-```sh
-make test
-make preflight
-```
-
-The publication scope is source, licenses, tests, documentation and the 35
-curated compressed data files. Build products, runtime outputs, caches, local
-configuration and old archives stay outside Git. No ZIP is required.
-
-The preflight verifies file hashes and the candidate Git file set without
-staging, committing or pushing. After staging the intended changes, run
-`python3 scripts/check_git_release.py --staged` to check the actual index.
-See [the Git release checklist](docs/GIT_RELEASE.md) for checksum maintenance
-and the separate review of Git history and hosting metadata before anonymizing.
-The optional ZIP export tool remains available for local use.
-
-[data/README.md](data/README.md) describes the unchanged data and conversions.
-[VALIDATION.md](VALIDATION.md) records verification scope.
-Source-content author identifiers are omitted; this does not anonymize Git
-history or hosting metadata. Required third-party copyright and
-license notices remain in [LICENSE.txt](LICENSE.txt) and
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

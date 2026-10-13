@@ -6,16 +6,15 @@ display names use the mapping in [ALGORITHM_LABELS.md](ALGORITHM_LABELS.md).
 
 ## Files to publish
 
-The inventory is defined by `scripts/release_files.py`, with `SHA256SUMS`
-added to the Git tree. It includes source, build recipes, tests, documentation,
+The inventory is defined by `scripts/release_files.py`. It includes source, build recipes, tests, documentation,
 required licenses and all 35 curated data files. Generated figures, new runs,
 logs, build products, virtual environments and local configuration are not
 part of the release. Keep them in ignored locations; do not force-add them.
 Ignored files can remain locally without being published.
 
 Text files use LF line endings; compressed raw data are binary and unchanged.
-The checksum inventory describes file contents, not executable permissions or
-Git authorship. Preserve required third-party notices and dependency versions.
+No manually maintained source checksum file is required. Preserve required
+third-party notices and dependency versions.
 
 ## Check the candidate and staged content
 
@@ -28,7 +27,7 @@ git status --short
 git diff --check
 ```
 
-`make preflight` verifies the complete checksum/data inventory and compares it
+`make preflight` checks the publication inventory and readable data, and compares it
 with tracked and non-ignored untracked working files. It makes no Git changes.
 This checks the candidate tree, not what has already been staged or committed.
 Review and stage the intended changes, including new documentation and tests,
@@ -45,16 +44,10 @@ file types and staged content that differs from the verified working files.
 It does not certify previous commits or publish anything. Commit and push are
 separate, deliberate steps after review.
 
-If a published source/documentation file is intentionally edited, review the
-changes first and regenerate `SHA256SUMS`:
-
-```sh
-python3 -c 'import sys; sys.path.insert(0, "scripts"); from release_files import ROOT, release_files; from verify_release import digest; (ROOT / "SHA256SUMS").write_text("".join(digest(p) + "  " + p.relative_to(ROOT).as_posix() + "\n" for p in release_files()))'
-make preflight
-```
-
-Do not alter the historical data hashes to bypass a failed data check.
-For a deeper data check, run `python3 scripts/verify_release.py --full`.
+After editing source or documentation, review the diff and rerun the checks;
+there is no checksum file to regenerate. For a deeper data check, run
+`python3 scripts/verify_release.py --full`. Historical data digests remain in
+the data manifest only as provenance metadata used by plot-label identification.
 
 ## Separate anonymity review
 

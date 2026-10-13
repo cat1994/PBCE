@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Export only the verified public source, license, tests and bundled data."""
 import argparse
-import hashlib
 from pathlib import Path
 import zipfile
 
@@ -15,7 +14,7 @@ def main():
     args = parser.parse_args()
     verify()
     output = args.output.resolve()
-    files = [*release_files(), ROOT / "SHA256SUMS"]
+    files = release_files()
     if output in [path.resolve() for path in files]:
         parser.error("output must not replace a source/data file")
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -31,10 +30,7 @@ def main():
         temporary.replace(output)
     finally:
         temporary.unlink(missing_ok=True)
-    checksum = hashlib.sha256(output.read_bytes()).hexdigest()
-    output.with_suffix(output.suffix + ".sha256").write_text(f"{checksum}  {output.name}\n")
     print(f"Release archive: {output} ({output.stat().st_size:,} bytes)")
-    print(f"SHA256: {checksum}")
 
 
 if __name__ == "__main__":

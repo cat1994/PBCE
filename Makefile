@@ -36,6 +36,6 @@ help:
 	@echo "make [JOBS=4]    Build the standalone runner and tests"
 	@echo "make test        Run C++ tests, Python tests and integration smoke"
 	@echo "make figures     Redraw fixed/adaptive paper figures from bundled data"
-	@echo "make verify      Verify source and lossless raw-data checksums"
+	@echo "make verify      Check publication files and readable bundled data"
 	@echo "make preflight   Check the candidate Git release without staging or pushing"
 	@echo "make release     Optional ZIP export (not required for Git publication)"

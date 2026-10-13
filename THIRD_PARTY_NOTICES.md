@@ -2,9 +2,7 @@
 
 The original MIT license and copyright notice are preserved in [LICENSE.txt](LICENSE.txt).
 
-The exact source-file SHA-256 values before extraction edits and dependency
-provenance are recorded in [docs/source_manifest.json](docs/source_manifest.json).
-These are provenance hashes, not checksums of the translated distribution files.
+Dependency provenance is recorded in [docs/source_manifest.json](docs/source_manifest.json).
 
 ## OpenSpiel
 

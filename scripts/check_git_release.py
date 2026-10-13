@@ -24,7 +24,7 @@ def names(raw):
 def check_repository(root, expected_files, staged=False):
     """Check a repository without staging, committing, or changing Git settings.
 
-    expected_files contains repository-relative POSIX paths, including SHA256SUMS.
+    expected_files contains repository-relative POSIX publication paths.
     In worktree mode, deleted tracked files are treated as planned removals.
     Staged mode requires index contents to match the worktree under Git's normal
     text/line-ending conversion rules, rather than comparing raw CRLF bytes.
@@ -102,7 +102,6 @@ def main():
 
         verify()
         expected = {path.relative_to(ROOT).as_posix() for path in release_files()}
-        expected.add("SHA256SUMS")
         count = check_repository(ROOT, expected, args.staged)
     except (ValueError, OSError, KeyError) as error:
         sys.exit(f"Git release preflight failed: {error}")

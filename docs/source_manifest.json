@@ -1,7 +1,6 @@
 {
   "distribution": "Anonymous PBCE source and data",
   "source_state": "standalone snapshot; author-repository provenance omitted for anonymous distribution",
-  "distribution_checksums": "SHA256SUMS",
   "dependencies": {
     "open_spiel": {
       "upstream": "https://github.com/google-deepmind/open_spiel",

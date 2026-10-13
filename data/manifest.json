@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "created_date": "2026-10-13",
-  "description": "Complete historical raw metric records selected for the PBCE manuscript figures. Stored metric names are preserved and do not certify equivalence to the current manuscript definitions.",
+  "description": "Raw metric records for the five-game fixed and adaptive PBCE figures.",
   "source_project": "anonymous historical experiment archive",
   "games": [
     "kuhn_3p",
@@ -31,10 +31,6 @@
     "filename": "",
     "compresslevel": 6
   },
-  "excluded": [
-    "Root data_pbce adaptive files use epsilon_decay=0.75, not the manuscript value 0.5.",
-    "Non-manuscript games, alternative solver/update variants, logs, duplicate NPY objects, and backups."
-  ],
   "files": [
     {
       "path": "raw/fixed/pefr.kuhn_3p.null.sim.gen.1e-1.ssv.gz",

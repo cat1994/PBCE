@@ -19,10 +19,10 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from pbce.experiments import GAME_MAP
+from pbce.experiments import GAME_MAP, PBCE_ALGORITHMS
 
-ALGORITHMS = {"A-EFR_IN", "CSPS-EFR", "CFPS-EFR", "CFR", "CFR_IN"}
-REFERENCE_ALGORITHMS = ALGORITHMS - {"CFR", "CFR_IN"}
+ALGORITHMS = PBCE_ALGORITHMS
+# ACSR and normalized fields are checked only as historical output diagnostics.
 METRICS = (
     "posr", "osr", "csr", "acsr", "posr_norm", "osr_norm", "csr_norm",
     "w_min", "w_min_positive", "w_mean", "w_max", "w_at_max_csr",
@@ -36,6 +36,7 @@ ADAPTIVE_FLAGS = [
 ]
 EXE = None
 REFERENCE_EXE = None
+HISTORICAL_REFERENCE = False
 
 
 class PbceSmokeTests(unittest.TestCase):
@@ -194,6 +195,29 @@ class PbceSmokeTests(unittest.TestCase):
                     self.assert_numerically_equal(sum(probabilities), 1)
         self.assertEqual(seen_stages, {(algorithm, stage) for algorithm in ALGORITHMS for stage in range(3)})
 
+    def test_fixed_and_single_stage_signed_metrics_agree(self):
+        # Same trajectory and epsilon: fixed lifetime sums must agree with
+        # zero-initialized stage sums, even with CFR+ optimization enabled.
+        # Include the last record to catch a missing final evaluation round.
+        fixed_output, _ = self.run_experiment()
+        fixed = self.fixed_records(fixed_output)
+        adaptive_output, _ = self.run_experiment([
+            "--adaptive_epsilon=true", "--epsilon_init=0.01",
+            "--epsilon_min=0.01", "--checkpoint_freq=1",
+            "--min_stage_iterations=100", "--stability_window=2",
+        ])
+        adaptive = self.adaptive_records(adaptive_output)
+        checkpoints = [row for row in adaptive if row["record_type"] == "CHECKPOINT"]
+        self.assertEqual(len(checkpoints), 12 * len(ALGORITHMS))
+        for row in checkpoints:
+            rounds = int(row["stage_t"])
+            values = fixed[rounds - 1][row["algorithm"]]
+            for actual, field in ((values[2] / rounds, "posr"),
+                                  (values[3] / rounds, "osr"),
+                                  (values[4], "csr"),
+                                  (values[5], "acsr")):
+                self.assert_numerically_equal(actual, float(row[field]))
+
     def test_adaptive_budget_limit_keeps_partial_policy_history(self):
         flags = [*ADAPTIVE_FLAGS, "--t=2"]
         output, _ = self.run_experiment(flags)
@@ -215,30 +239,31 @@ class PbceSmokeTests(unittest.TestCase):
             with self.subTest(flags=flags):
                 self.run_experiment(flags, success=False)
 
-    def test_optional_reference_equivalence_for_unchanged_algorithms(self):
+    def test_optional_reference_equivalence(self):
         if REFERENCE_EXE is None:
             self.skipTest("No reference executable supplied")
+        actual_flags = ["--legacy_algorithm_mapping=true"] if HISTORICAL_REFERENCE else []
         for flags in ([], ["--alt=false", "--cfr_plus=false"]):
             with self.subTest(flags=flags):
-                actual_output, _ = self.run_experiment(flags)
+                actual_output, _ = self.run_experiment([*flags, *actual_flags])
                 reference_output, _ = self.run_experiment(flags, executable=REFERENCE_EXE)
                 actual = self.fixed_records(actual_output)
                 expected = self.fixed_records(reference_output)
                 for iteration in actual:
-                    for algorithm in REFERENCE_ALGORITHMS:
+                    for algorithm in ALGORITHMS:
                         for index in (0, 2, 3, 4, 5):
                             self.assert_numerically_equal(
                                 actual[iteration][algorithm][index], expected[iteration][algorithm][index]
                             )
-        actual_output, _ = self.run_experiment(ADAPTIVE_FLAGS)
+        actual_output, _ = self.run_experiment([*ADAPTIVE_FLAGS, *actual_flags])
         reference_output, _ = self.run_experiment(ADAPTIVE_FLAGS, executable=REFERENCE_EXE)
         actual = [
             row for row in self.adaptive_records(actual_output)
-            if row["algorithm"] in REFERENCE_ALGORITHMS
+            if row["algorithm"] in ALGORITHMS
         ]
         expected = [
             row for row in self.adaptive_records(reference_output)
-            if row["algorithm"] in REFERENCE_ALGORITHMS
+            if row["algorithm"] in ALGORITHMS
         ]
         self.assertEqual(len(actual), len(expected))
         for row, reference in zip(actual, expected):
@@ -256,7 +281,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--exe", type=Path, required=True)
     parser.add_argument("--reference-exe", type=Path)
+    parser.add_argument(
+        "--historical-reference", action="store_true",
+        help="Compare all five historical algorithms with a historical reference executable.",
+    )
     args = parser.parse_args()
+    if args.historical_reference and args.reference_exe is None:
+        parser.error("--historical-reference requires --reference-exe")
+    HISTORICAL_REFERENCE = args.historical_reference
     EXE = args.exe.resolve()
     REFERENCE_EXE = args.reference_exe.resolve() if args.reference_exe else None
     for executable in (EXE, REFERENCE_EXE):

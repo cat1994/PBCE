@@ -40,6 +40,8 @@ ABSL_FLAG(int32_t, random_seed, 0, "Seed for a sampler's random engine.");
 ABSL_FLAG(bool, show_num, false, "Only show the number of algorithms.");
 ABSL_FLAG(size_t, alg_group, 3, "Algorithm group (only PBCE group 3 is supported).");
 ABSL_FLAG(double, epsilon, 0.0, "Fixed perturbation parameter.");
+ABSL_FLAG(bool, legacy_algorithm_mapping, false,
+          "Replay historical CFR/CFR_IN implementations instead of paper CF/CF-IN.");
 ABSL_FLAG(int32_t, threads, 1, "Number of algorithms to run concurrently.");
 ABSL_FLAG(std::string, file_dir, "data/test_results.ssv", "Result file.");
 ABSL_FLAG(bool, alt, true, "Use alternate/Gauss-Seidel updates.");
@@ -707,11 +709,17 @@ bool run_experiment() {
   const bool adaptive = absl::GetFlag(FLAGS_adaptive_epsilon);
   const double initial_epsilon =
       adaptive ? absl::GetFlag(FLAGS_epsilon_init) : absl::GetFlag(FLAGS_epsilon);
-  const auto labeled_algs = ltbr_perturbed_cfr_algs(initial_epsilon);
+  const bool legacy_algorithm_mapping = absl::GetFlag(FLAGS_legacy_algorithm_mapping);
+  const auto labeled_algs =
+      ltbr_perturbed_cfr_algs(initial_epsilon, legacy_algorithm_mapping);
   const auto alg_labels = LearnerProfileLabels(labeled_algs);
   if (absl::GetFlag(FLAGS_show_num)) {
     std::cout << alg_labels.size() << '\n';
     return true;
+  }
+
+  if (legacy_algorithm_mapping) {
+    std::cout << "Algorithm mapping: historical implementation (CFR/CFR_IN are historical labels).\n";
   }
 
   hr_edl::CachedDecisionPoint root(game->NewInitialState(), false, true);
@@ -759,18 +767,21 @@ bool run_experiment() {
             }
             const auto frozen = learner->Frozen();
             stopwatch.reset();
-            const double ev = t < iterations - 1
-                                  ? (alt ? learner->UpdateAlternateAndReturnEv(local_root, *sampler)
-                                         : learner->UpdateAndReturnEv(local_root, *sampler, frozen))
-                                  : learner->Ev(local_root, *sampler, frozen);
+            // Every record contains exactly t+1 evaluated rounds, including
+            // the final record. The pre-update profile supplies this round.
+            const double ev = alt
+                                  ? learner->UpdateAlternateAndReturnEv(local_root, *sampler)
+                                  : learner->UpdateAndReturnEv(local_root, *sampler, frozen);
             const double elapsed = stopwatch.milliseconds();
-            const auto regrets = learner->PhiRegrets();
+            // Fixed runs form one evaluation stage. Read the independent
+            // signed accumulators, never the recursively clipped RM+ state.
+            const auto metrics = learner->StageMetrics(absl::GetFlag(FLAGS_w_numerical_eps));
             fixed_records[alg][t] = {ev,
                                      elapsed,
-                                     std::get<0>(regrets),
-                                     std::get<1>(regrets),
-                                     std::get<2>(regrets),
-                                     std::get<3>(regrets)};
+                                      metrics.max_transformed_full_regret,
+                                      metrics.max_original_full_regret,
+                                      metrics.max_conditional_regret,
+                                      metrics.sum_positive_conditional_regret};
             if (!verbose && iteration_log_interval > 0 &&
                 ((t + 1) % iteration_log_interval == 0 || t + 1 == iterations)) {
               std::lock_guard<std::mutex> lock(iteration_log_mutex);
@@ -1053,7 +1064,7 @@ bool run_experiment() {
       for (size_t alg = 0; alg < alg_labels.size(); ++alg) {
         const auto& r = fixed_records[alg][t];
         out << alg_labels[alg] << "  "
-            << absl::StrFormat("(%g, %g, %g, %g, %g, %g)", r.ev, r.milliseconds, r.posr_numerator,
+            << absl::StrFormat("(%.17g, %.17g, %.17g, %.17g, %.17g, %.17g)", r.ev, r.milliseconds, r.posr_numerator,
                                r.osr_numerator, r.csr, r.acsr)
             << '\n';
       }

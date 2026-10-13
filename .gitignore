@@ -1,12 +1,44 @@
+# Local build and generated experiment/plot outputs.
 /build*/
-/data/
-/results/
-__pycache__/
-*.py[cod]
+/cmake-build*/
+/outputs/
+/dist/
+/tmp/
+/CMakeFiles/
+/CMakeCache.txt
+/Testing/
 *.log
-*.tmp
-*.ssv
-*.npy
-.DS_Store
+
+# Python environments and caches.
+/.venv/
+/venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.py[cod]
+.coverage
+htmlcov/
+
+# Local editor, assistant, environment and credential configuration.
 .idea/
 .vscode/
+/.codex/
+/.agents/
+/.env
+/.env.*
+!/.env.example
+/.ssh/
+/.aws/
+*.tmp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Keep only the curated historical data. New runs belong in outputs/.
+/data/*
+!/data/README.md
+!/data/manifest.json
+!/data/raw/

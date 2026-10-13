@@ -9,7 +9,7 @@
 #include "hr_edl/tabular_learner.h"
 
 // Use the newly accumulated regret without additional discounting.
-inline double RmUpdate(double prev_regret, double next_regret, size_t iteration) {
+inline double RmUpdate(double, double next_regret, size_t) {
   return next_regret;
 }
 
@@ -37,12 +37,14 @@ inline std::vector<std::string> LearnerProfileLabels(
   return labels;
 }
 
+// Historical labels are kept for compatibility with the bundled results.
+// Paper names: ACT-IN, CSPS, CFPS, CF, and CF-IN, respectively.
 inline std::vector<LabeledAdaptiveProfile> ltbr_perturbed_cfr_algs(
-    double epsilon) {
+    double epsilon, bool legacy_algorithm_mapping = false) {
   return {
       LabeledAdaptiveProfile{
           "A-EFR_IN",
-          [epsilon](size_t num_players, double utility_diameter) {
+          [epsilon](size_t num_players, double) {
             return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
                 hr_edl::BehavioralDeviationTabularCfvLearner<
                     hr_edl::InformedActionSequencePredecessors>::NewList(num_players, RmUpdate,
@@ -51,7 +53,7 @@ inline std::vector<LabeledAdaptiveProfile> ltbr_perturbed_cfr_algs(
           }},
       LabeledAdaptiveProfile{
           "CSPS-EFR",
-          [epsilon](size_t num_players, double utility_diameter) {
+          [epsilon](size_t num_players, double) {
             return hr_edl::AdaptiveProfilePtr(
                 new hr_edl::PerturbedCfTreeLearnerProfile(
                     hr_edl::BehavioralDeviationTabularCfvLearner<
@@ -60,7 +62,7 @@ inline std::vector<LabeledAdaptiveProfile> ltbr_perturbed_cfr_algs(
           }},
       LabeledAdaptiveProfile{
           "CFPS-EFR",
-          [epsilon](size_t num_players, double utility_diameter) {
+          [epsilon](size_t num_players, double) {
             return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
                 hr_edl::BehavioralDeviationTabularCfvLearner<
                     hr_edl::CounterfactualPartialSequencePredecessors>::NewList(num_players,
@@ -69,7 +71,13 @@ inline std::vector<LabeledAdaptiveProfile> ltbr_perturbed_cfr_algs(
           }},
       LabeledAdaptiveProfile{
           "CFR",
-          [epsilon](size_t num_players, double utility_diameter) {
+          [epsilon, legacy_algorithm_mapping](size_t num_players, double) {
+            if (legacy_algorithm_mapping) {
+              return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
+                  hr_edl::BehavioralDeviationTabularCfvLearner<
+                      hr_edl::CounterfactualPartialSequenceExInPredecessors>::NewList(
+                      num_players, RmUpdate, RmLink), epsilon));
+            }
             return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
                 hr_edl::BehavioralDeviationTabularCfvLearner<
                     hr_edl::ImmediateExternalSequencePredecessors>::NewList(
@@ -78,7 +86,13 @@ inline std::vector<LabeledAdaptiveProfile> ltbr_perturbed_cfr_algs(
           }},
       LabeledAdaptiveProfile{
           "CFR_IN",
-          [epsilon](size_t num_players, double utility_diameter) {
+          [epsilon, legacy_algorithm_mapping](size_t num_players, double) {
+            if (legacy_algorithm_mapping) {
+              return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
+                  hr_edl::BehavioralDeviationTabularCfvLearner<
+                      hr_edl::TwiceInformedPartialSequencePredecessors>::NewList(
+                      num_players, RmUpdate, RmLink), epsilon));
+            }
             return hr_edl::AdaptiveProfilePtr(new hr_edl::PerturbedCfTreeLearnerProfile(
                 hr_edl::BehavioralDeviationTabularCfvLearner<
                     hr_edl::ImmediateInternalSequencePredecessors>::NewList(

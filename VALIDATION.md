@@ -1,54 +1,75 @@
-# Release validation — 2026-10-13
+# Validation scope
 
-Environment: Ubuntu, GCC 11.4.0, CMake 3.22.1, Python 3.10.12,
-NumPy 1.26.4, Matplotlib 3.7.5.
+The submitted manuscript and bundled historical measurements are unchanged.
+This release separates corrected new runs from archived results; see
+[implementation status](docs/IMPLEMENTATION_STATUS.md).
 
-## Completed checks
+## Current verification results
 
-- Release build and all seven CTest entries passed: four inherited C++
-  regression tests, the new PBCE invariants test, Python tests, and integration
-  smoke tests.
-- The Python suite includes 19 launcher checks and 10 plotting/parser checks.
-  Checks exercise output protection, path independence, child cleanup,
-  complete/finite results, metric conversion, raw/gzip inputs, sampling order,
-  terminal epsilon, malformed rows and missing/invalid terminal records.
-- PBCE invariants cover all five algorithms in default and historical modes
-  on three-player Kuhn: feasible action probabilities, preservation of realized
-  policies when epsilon shrinks, stage resets and subsequent learner updates.
-- Default-mode fixed and adaptive small-game outputs agree numerically with
-  the pre-cleanup standalone executable for all five algorithms. Historical
-  mode agrees with the parent-project executable. Each integration suite
-  passed six tests; timing columns are excluded from numerical comparison.
-- The actual launcher ran six fixed jobs plus one adaptive job in each mapping
-  mode from an unrelated working directory. Output completeness and binary
-  metadata were checked; reusing the output directory was rejected as expected.
-- All 35 compressed data files match their manifest and decompress to the
-  exact original raw SHA-256 values. The source files remained unchanged.
-- The paper's 150,000 retained fixed data rows and 44,194 adaptive rows were
-  checked against the selected raw files. All ten original paper PDFs matched
-  their server counterparts by SHA-256. See `data/manifest.json` for details.
-- All 60,000 plotted fixed-data scalars (five games, six epsilons, five
-  algorithms, 100 samples, x plus three metrics) equal the original notebook's
-  sampled values exactly. The two-step sampling indices also agree exactly.
-- The new script generated all ten PDFs and PNG previews directly from bundled
-  gzip inputs. The five-game fixed and adaptive CSPS grids were visually
-  inspected for clipping, labels, stages, scales and legends.
-- The identical plotting script and its ten parser tests passed in
-  `correlated_eq`, including a five-game adaptive figure using its default data
-  paths. Script hashes match across the two repositories.
-- `verify_release.py --full` passed for all 1,779 release files and 35 data
-  archives, including full parsing of fixed records and adaptive checkpoints.
-- The source/data ZIP was extracted into a separate clean directory, verified,
-  configured and compiled without downloading dependencies; all seven CTest
-  entries passed again. The final documentation/checksum update does not change
-  any of that tested source code.
+- Release build and all seven CTest entries passed.
+- All 57 Python checks passed: 19 runner tests, 18 plotting/parser tests and
+  20 Git-preflight tests using isolated temporary repositories.
+- All ten five-game figures rendered successfully in PDF, PNG and SVG.
+  Their 35 inputs were recognized by hash as the historical archive. Fixed CF
+  and adaptive CF-IN previews were visually checked for readable headings,
+  provenance notes and unclipped panels.
+- All 30 rendered files passed checks for removal of author, generator and
+  timestamp metadata. Plot manifests contain no absolute machine paths.
+- This Git-publication cleanup changes no solver or plot numeric logic.
+  Ten text files were normalized to LF so Git checkouts retain the recorded
+  content hashes; executable permissions were removed from 338 source files.
+  Data-generation and processing labels remain unchanged.
 
-## Scope
+## Solver and runner checks
 
-The full 100,000-iteration experiments were not rerun. Numerical regressions
-verify small-game preservation; archive verification and figure reproduction
-use complete existing raw data. Neither proves equivalence of the inherited
-metrics and memory propagation to the current manuscript definitions. The
-remaining scientific differences are in `docs/IMPLEMENTATION_STATUS.md`.
+The C++ tests cover all five deviation families, including intended/realized
+memory weights, signed evaluation versus CFR+ state, exposure, stage resets,
+next-round aggregation, feasible policies and warm starts. Integration tests
+compare fixed and single-stage adaptive statistics at every checkpoint,
+including the final round.
 
-No GitHub push or public release upload is part of this local preparation.
+These targeted checks do not establish complete equivalence to an explicitly
+expanded perturbed game or every full-continuation OSR objective. Full
+100,000-iteration experiments have not been rerun. Selecting historical
+predecessor classes does not revert the corrected weight/statistic semantics.
+
+## Git publication and labels
+
+Generation labels, record keys, numeric conversions, sampling positions and
+figure filenames are preserved. Figure display names follow the paper, with
+provenance annotations for historical or unidentified mappings. Plotting tests
+cover raw and gzip input, malformed records, metric conversion, sampling,
+completion, display aliases and conflicting provenance.
+
+Author-repository links, identifying source revisions and private provenance
+are omitted from source content. Required upstream copyright and licenses
+are preserved. Git ignores build products, caches, logs, archives and runtime
+outputs. The preflight audits the candidate file set or staged index against
+the release inventory. It does not anonymize Git history, remotes or hosting
+metadata; those require a separate publication review. The 35 gzip headers have no
+source filename, timestamp, comment or extra fields, and the decompressed
+records were scanned for author identifiers and personal paths.
+
+The package includes SHA-256 checks for its complete source/data inventory.
+All 35 compressed data files must match both their compressed and decompressed
+manifest digests before publication. Run `python3 scripts/verify_release.py --full`
+to additionally parse every fixed record and adaptive checkpoint.
+
+## Historical data selection checks
+
+Previously completed checks of the selected archive found:
+
+- 150,000 retained fixed array rows and 44,194 adaptive rows matched the raw
+  files; adaptive comparisons used relative tolerance 1e-13 and absolute
+  tolerance 1e-15.
+- All 60,000 plotted fixed-data scalars and the two-step sampling indices
+  matched the original notebook exactly.
+- All ten original manuscript PDFs matched their archived plotting outputs
+  by SHA-256.
+
+These are checks of the historical measurements, not corrected solver reruns.
+New figure headings and provenance annotations intentionally change rendered
+PDFs without changing their plotted numbers. See [data documentation](data/README.md)
+and [label mappings](docs/ALGORITHM_LABELS.md).
+
+No public push or release upload is part of this preparation.

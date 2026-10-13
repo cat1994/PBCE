@@ -147,6 +147,44 @@ struct ReachProbLists {
   size_t Size() const { return prev_.size(); }
 };
 
+// Invert x = epsilon * 1 + (1 - n * epsilon) * xi. Only round-off-sized
+// violations are repaired; an infeasible cached execution policy is an error.
+inline std::vector<double> IntendedPolicy(const std::vector<double>& realized,
+                                          double epsilon) {
+  if (!std::isfinite(epsilon) || epsilon < 0.0 || realized.empty()) {
+    throw std::invalid_argument("expected a nonempty policy and finite non-negative epsilon");
+  }
+  const double scale = 1.0 - realized.size() * epsilon;
+  if (scale <= 0.0) {
+    throw std::invalid_argument(
+        "epsilon must satisfy epsilon < 1 / num_actions at every information set");
+  }
+  const double tolerance = 64.0 * std::numeric_limits<double>::epsilon() *
+                           std::max<size_t>(1, realized.size());
+  const double upper = epsilon + scale;
+  double realized_sum = 0.0;
+  double intended_sum = 0.0;
+  std::vector<double> intended;
+  intended.reserve(realized.size());
+  for (double probability : realized) {
+    if (!std::isfinite(probability) || probability < epsilon - tolerance ||
+        probability > upper + tolerance) {
+      throw std::invalid_argument("realized policy is outside the epsilon-constrained simplex");
+    }
+    realized_sum += probability;
+    const double value = std::clamp((probability - epsilon) / scale, 0.0, 1.0);
+    intended.push_back(value);
+    intended_sum += value;
+  }
+  if (std::abs(realized_sum - 1.0) > tolerance || intended_sum <= 0.0) {
+    throw std::invalid_argument("realized policy must sum to one");
+  }
+  // Preserve the unperturbed policy exactly, including its floating-point sum.
+  if (epsilon == 0.0) return realized;
+  for (double& probability : intended) probability /= intended_sum;
+  return intended;
+}
+
 // Immediate decision information for one information state; Update() updates its policy.
 // Inherits CachedImmediatePolicy and stores policy_, internal/external transformations, and their regrets.
 class ImmediateDecisionInfo : public CachedImmediatePolicy {
@@ -190,8 +228,27 @@ class ImmediateDecisionInfo : public CachedImmediatePolicy {
               const ReachProbLists& ex_pred_reach_prob_lists,
               const ReachProbLists& in_pred_reach_prob_lists, double epsilon = 0.0,
               double iwrp = 0.0) {
-    if (!std::isfinite(epsilon) || epsilon < 0.0) {
-      throw std::invalid_argument("epsilon must be finite and non-negative");
+    Update(cfvs, update_target, f, ex_pred_reach_prob_lists, in_pred_reach_prob_lists,
+           ex_pred_reach_prob_lists, in_pred_reach_prob_lists, epsilon, iwrp);
+  }
+
+  // Solver memory weights use xi; original-game regret and exposure diagnostics
+  // use x. The overload above remains suitable when both channels coincide.
+  void Update(const CfValues& cfvs, const RegretTransformation& update_target, const LinkFn& f,
+              const ReachProbLists& ex_pred_reach_prob_lists,
+              const ReachProbLists& in_pred_reach_prob_lists,
+              const ReachProbLists& original_ex_pred_reach_prob_lists,
+              const ReachProbLists& original_in_pred_reach_prob_lists,
+              double epsilon = 0.0, double iwrp = 0.0) {
+    const auto intended_policy = IntendedPolicy(policy_, epsilon);
+    const auto compatible = [](const ReachProbLists& solver, const ReachProbLists& original) {
+      return solver.prev_.size() == solver.next_.size() &&
+             original.prev_.size() == original.next_.size() &&
+             solver.Size() == original.Size();
+    };
+    if (!compatible(ex_pred_reach_prob_lists, original_ex_pred_reach_prob_lists) ||
+        !compatible(in_pred_reach_prob_lists, original_in_pred_reach_prob_lists)) {
+      throw std::invalid_argument("solver and diagnostic memory lists must have matching shapes");
     }
     // Update both lifetime diagnostics and exact, non-truncated stage-local
     // original-space accumulators before transforming the values.
@@ -200,22 +257,18 @@ class ImmediateDecisionInfo : public CachedImmediatePolicy {
         UpdateUnperturbedPhiRegrets(org_ex_regrets_, reached_probs_sum_ex_,
                                     stage_org_ex_regrets_, stage_reached_probs_sum_ex_,
                                     ex_phi_list_, cfvs, update_target,
-                                    ex_pred_reach_prob_lists, iwrp);
+                                    original_ex_pred_reach_prob_lists, iwrp);
       }
       if (in_pred_reach_prob_lists.Size() > 0) {
         UpdateUnperturbedPhiRegrets(org_in_regrets_, reached_probs_sum_in_,
                                     stage_org_in_regrets_, stage_reached_probs_sum_in_,
                                     in_phi_list_, cfvs, update_target,
-                                    in_pred_reach_prob_lists, iwrp);
+                                    original_in_pred_reach_prob_lists, iwrp);
       }
     }
     // Compute perturbed CFVs and map back to the original policy space.
     if (epsilon > 0.0) {
       size_t num_actions = policy_.size();
-      if (num_actions * epsilon >= 1.0) {
-        throw std::invalid_argument(
-            "epsilon must satisfy epsilon < 1 / num_actions at every information set");
-      }
       // Apply the local action-realization channel to the counterfactual values.
       CfValues perturbed_cfvs = cfvs;  // Copy the CFVs.
       double p_value = 0;
@@ -226,9 +279,7 @@ class ImmediateDecisionInfo : public CachedImmediatePolicy {
         perturbed_cfvs[aidx] = (1 - num_actions * epsilon) * cfvs[aidx] + p_value;
       }
       // Recover the intended local policy from the cached realized policy.
-      for (size_t a = 0; a < num_actions; ++a) {
-        policy_[a] = (policy_[a] - epsilon) / (1.0 - num_actions * epsilon);
-      }
+      policy_ = intended_policy;
       is_original_ = false;  // Mark the policy as being in the perturbed space.
 
       Update(perturbed_cfvs, update_target, f, ex_pred_reach_prob_lists, in_pred_reach_prob_lists,
@@ -513,8 +564,8 @@ class ImmediateDecisionInfo : public CachedImmediatePolicy {
 };
 }  // namespace _tl
 
-// The five deviation families exposed by this release. These helpers retain
-// the historical memory-weight computation; see docs/IMPLEMENTATION_STATUS.md.
+// The five deviation families exposed by this release. The same memory rule is
+// evaluated separately on intended solver and realized diagnostic policies.
 struct NoExternal {
   std::vector<double> ExternalPredecessorReachProbs(
       const std::vector<double>&) const { return {}; }
@@ -597,7 +648,7 @@ struct CausalPartialSequencePredecessors : CausalSuccessors {
   }
 };
 
-// Compatibility-only families used by the archived correlated_eq experiments.
+// Compatibility-only families used by the archived historical experiments.
 // Their old labels were CFR/CFR_IN, but they are not the paper's CF/CF-IN.
 struct CounterfactualPartialSequenceExInPredecessors
     : AllExternal, AllInternal, BlindPartialSequenceSuccessors {};
@@ -686,19 +737,26 @@ class BehavioralDeviationTabularCfvLearner
   void Update(const std::vector<std::string>& initial_info_states,
               const InfoStateUvm<CfValueTreeNode>& cf_value_tree,
               double epsilon = 0.0) override final {
+    if (!std::isfinite(epsilon) || epsilon < 0.0) {
+      throw std::invalid_argument("epsilon must be finite and non-negative");
+    }
+    struct MemoryProbLists {
+      _tl::ReachProbLists intended;
+      _tl::ReachProbLists realized;
+    };
     struct StackState {
       const std::string* info_state;
-      const _tl::ReachProbLists* probabilities;
+      const MemoryProbLists* probabilities;
     };
     std::vector<StackState> stack;
     stack.reserve(cf_value_tree.size());
 
     // Successor lists can be shared by sibling information states. Owning
     // pointers keep them stable and also release them if an update throws.
-    std::vector<std::unique_ptr<_tl::ReachProbLists>> probability_lists;
+    std::vector<std::unique_ptr<MemoryProbLists>> probability_lists;
     probability_lists.reserve(cf_value_tree.size() + 1);
     probability_lists.push_back(
-        std::make_unique<_tl::ReachProbLists>(_tl::ReachProbLists{{1.0}, {1.0}}));
+        std::make_unique<MemoryProbLists>(MemoryProbLists{{{1.0}, {1.0}}, {{1.0}, {1.0}}}));
     for (const auto& info_state : initial_info_states) {
       stack.push_back({&info_state, probability_lists.back().get()});
     }
@@ -717,28 +775,42 @@ class BehavioralDeviationTabularCfvLearner
       }
 
       const _tl::ReachProbLists external = {
-          dev_seq_predecessors_.ExternalPredecessorReachProbs(predecessor->prev_),
-          dev_seq_predecessors_.ExternalPredecessorReachProbs(predecessor->next_)};
+          dev_seq_predecessors_.ExternalPredecessorReachProbs(predecessor->intended.prev_),
+          dev_seq_predecessors_.ExternalPredecessorReachProbs(predecessor->intended.next_)};
       const _tl::ReachProbLists internal = {
-          dev_seq_predecessors_.InternalPredecessorReachProbs(predecessor->prev_),
-          dev_seq_predecessors_.InternalPredecessorReachProbs(predecessor->next_)};
+          dev_seq_predecessors_.InternalPredecessorReachProbs(predecessor->intended.prev_),
+          dev_seq_predecessors_.InternalPredecessorReachProbs(predecessor->intended.next_)};
+      const _tl::ReachProbLists original_external = {
+          dev_seq_predecessors_.ExternalPredecessorReachProbs(predecessor->realized.prev_),
+          dev_seq_predecessors_.ExternalPredecessorReachProbs(predecessor->realized.next_)};
+      const _tl::ReachProbLists original_internal = {
+          dev_seq_predecessors_.InternalPredecessorReachProbs(predecessor->realized.prev_),
+          dev_seq_predecessors_.InternalPredecessorReachProbs(predecessor->realized.next_)};
       auto& local = GetOrCreateFromArgs(local_info_map_, *info_state, num_actions,
                                        external.Size(), internal.Size());
       local.SetCfrPlus(is_cfr_plus_);
       const auto previous_policy = local.Response();
-      local.Update(cf_values, update_target_, f_, external, internal, epsilon, iwrp);
+      const auto previous_intended = _tl::IntendedPolicy(previous_policy, epsilon);
+      local.Update(cf_values, update_target_, f_, external, internal,
+                   original_external, original_internal, epsilon, iwrp);
       const auto next_policy = local.Response();
+      const auto next_intended = _tl::IntendedPolicy(next_policy, epsilon);
 
-      // Preserve the historical execution-policy weights. This does not yet
-      // implement the manuscript's separate intended-policy memory weights.
+      // Carry both w^t and w^{t+1} in their own coordinates. Counterfactual
+      // successor rules still return {1}, independently of either policy.
       for (size_t action = 0; action < num_actions; ++action) {
         if (child_keys[action].empty()) continue;
         auto previous = dev_seq_predecessors_.SuccessorReachProbs(
-            predecessor->prev_, previous_policy.data(), num_actions, action);
+            predecessor->intended.prev_, previous_intended.data(), num_actions, action);
         auto next = dev_seq_predecessors_.SuccessorReachProbs(
-            predecessor->next_, next_policy.data(), num_actions, action);
-        probability_lists.push_back(std::make_unique<_tl::ReachProbLists>(
-            _tl::ReachProbLists{std::move(previous), std::move(next)}));
+            predecessor->intended.next_, next_intended.data(), num_actions, action);
+        auto original_previous = dev_seq_predecessors_.SuccessorReachProbs(
+            predecessor->realized.prev_, previous_policy.data(), num_actions, action);
+        auto original_next = dev_seq_predecessors_.SuccessorReachProbs(
+            predecessor->realized.next_, next_policy.data(), num_actions, action);
+        probability_lists.push_back(std::make_unique<MemoryProbLists>(MemoryProbLists{
+            {std::move(previous), std::move(next)},
+            {std::move(original_previous), std::move(original_next)}}));
         const auto* successor = probability_lists.back().get();
         for (const auto& child : child_keys[action]) {
           stack.push_back({&child, successor});

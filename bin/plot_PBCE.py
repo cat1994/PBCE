@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Plot archived PBCE/PEFR fixed and adaptive diagnostics from SSV or SSV.GZ.
+"""Plot PBCE/PEFR fixed and adaptive diagnostics from SSV or SSV.GZ.
 
-The three columns retain the historical experiment's metric names. See the
-release's docs/IMPLEMENTATION_STATUS.md for differences from the current paper.
-No pickled NumPy files or notebook execution are required.
+Raw algorithm labels and numerical values are preserved. Display labels follow
+the paper, with visible provenance: historical CFR/CFR_IN are not the paper's
+CF/CF-IN families. See docs/IMPLEMENTATION_STATUS.md for the metric audit.
 """
 
 import argparse
@@ -20,6 +20,18 @@ ROOT = Path(__file__).resolve().parents[1]
 GAMES = ("kuhn_3p", "leduc", "random_goofspiel", "sheriff", "tiny_bridge")
 ALGORITHMS = ("A-EFR_IN", "CFR", "CFR_IN", "CSPS-EFR", "CFPS-EFR")
 LABELS = dict(zip(ALGORITHMS, ("ACT-IN", "CF", "CF-IN", "CSPS", "CFPS")))
+PAPER_CLASSES = {
+    "A-EFR_IN": "InformedActionSequencePredecessors",
+    "CFR": "ImmediateExternalSequencePredecessors",
+    "CFR_IN": "ImmediateInternalSequencePredecessors",
+    "CSPS-EFR": "CausalPartialSequencePredecessors",
+    "CFPS-EFR": "CounterfactualPartialSequencePredecessors",
+}
+HISTORICAL_CLASSES = {
+    **PAPER_CLASSES,
+    "CFR": "CounterfactualPartialSequenceExInPredecessors",
+    "CFR_IN": "TwiceInformedPartialSequencePredecessors",
+}
 GAME_LABELS = dict(zip(GAMES, (
     "Kuhn Poker (N=3)", "Leduc Poker (N=2)", "Goofspiel (4, R, N=2)",
     "Sheriff (N=2)", "Tiny Bridge (N=2)",
@@ -30,6 +42,85 @@ METRICS = ("posr", "osr", "csr")
 TITLES = (r"Perturbed OSR($\mu$) Gap", r"OSR($\nu$) Gap", r"CSR($\nu$) Gap")
 HEADER = "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)"
 ROW = re.compile(r"^(\S+)\s+\(([^()]*)\)$")
+
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def label_provenance(path, label_mode="auto", manifest_path=None):
+    """Resolve family provenance without changing any raw parser keys.
+
+    Archive hashes establish historical identity, while a launch sidecar records
+    the selected family mode for a fresh run. Unrecognized external files remain
+    unspecified unless the caller explicitly declares a mode.
+    """
+    digest = sha256(path)
+    manifest_path = manifest_path or ROOT / "data/manifest.json"
+    evidence = []
+    detected = set()
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for entry in manifest.get("files", []):
+            if digest in (entry.get("gzip_sha256"), entry.get("source_sha256")):
+                detected.add("historical")
+                evidence.append("bundled_archive_sha256")
+                break
+    uncompressed = path.with_suffix("") if path.suffix == ".gz" else path
+    sidecar = uncompressed.with_suffix(".metadata.json")
+    if sidecar.is_file():
+        metadata = json.loads(sidecar.read_text(encoding="utf-8"))
+        legacy = metadata.get("legacy_algorithm_mapping")
+        if isinstance(legacy, bool):
+            detected.add("historical" if legacy else "paper")
+            evidence.append("launcher_metadata_mode")
+    if len(detected) > 1:
+        raise ValueError(f"{path.name}: archive hash and launch metadata disagree on algorithm families")
+    inferred = next(iter(detected), "unspecified")
+    if label_mode != "auto":
+        if inferred != "unspecified" and inferred != label_mode:
+            raise ValueError(f"{path.name}: --label-mode {label_mode} contradicts {inferred} source provenance")
+        inferred = label_mode
+        evidence.append("explicit_label_mode")
+    classes = PAPER_CLASSES if inferred == "paper" else HISTORICAL_CLASSES if inferred == "historical" else {}
+    return {
+        "sha256": digest,
+        "label_mode": inferred,
+        "evidence": evidence or ["unverified_external_input"],
+        "algorithm_mapping": [
+            {"raw_label": raw, "display_label": LABELS[raw],
+             "class": classes.get(raw),
+             "paper_family_equivalence": (
+                 None if inferred == "unspecified" else
+                 not (inferred == "historical" and raw in ("CFR", "CFR_IN"))) }
+            for raw in ALGORITHMS
+        ],
+    }
+
+
+def figure_provenance(algorithm, contexts):
+    modes = {context["label_mode"] for context in contexts}
+    if len(modes) != 1:
+        if algorithm in ("CFR", "CFR_IN"):
+            raise ValueError(
+                f"{LABELS[algorithm]}: mixed or unknown family provenance across inputs; "
+                "plot historical and paper-family runs separately")
+        return "mixed", "Mixed label provenance; see plot_manifest.json"
+    mode = next(iter(modes))
+    if mode == "historical":
+        if algorithm in ("CFR", "CFR_IN"):
+            note = f"Historical mapping: raw {algorithm} is not the paper's {LABELS[algorithm]} family"
+        else:
+            note = f"Historical-family label mapping (raw label: {algorithm}); source values unchanged"
+    elif mode == "paper":
+        note = f"Paper-family mapping (raw label: {algorithm})"
+    else:
+        note = f"Unverified label mapping from {algorithm}; family identity unspecified"
+    return mode, note
 
 
 def open_text(path):
@@ -167,24 +258,29 @@ def epsilon_label(value):
     return rf"{float(mantissa):g}\times10^{{{int(exponent)}}}"
 
 
-def draw_grid(series, games, algorithm, mode, output, formats, connect_stages):
+def draw_grid(series, games, algorithm, mode, output, formats, connect_stages, contexts):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
     from matplotlib.ticker import LogFormatterSciNotation, LogLocator, NullFormatter, ScalarFormatter
 
+    label_mode, provenance_note = figure_provenance(algorithm, contexts)
+    display_label = LABELS[algorithm]
     rc = {"font.size": 12, "axes.titlesize": 13, "axes.labelsize": 12,
           "axes.titleweight": "semibold", "xtick.labelsize": 10, "ytick.labelsize": 10,
           "legend.fontsize": 11, "figure.facecolor": "white", "axes.facecolor": "#FAFAFA",
           "axes.edgecolor": "#333333", "axes.linewidth": 0.8, "pdf.fonttype": 42,
-          "savefig.dpi": 180}
+          "savefig.dpi": 180, "svg.hashsalt": "pbce-anonymous"}
     with plt.rc_context(rc):
-        height = 2.55 * len(games) + 1.2
+        height = 2.55 * len(games) + 1.8
         fig, axes = plt.subplots(len(games), 3, figsize=(13, height), squeeze=False)
         fig.subplots_adjust(left=0.12, right=0.985, bottom=0.6 / height,
-                            top=1 - (0.9 if mode == "fixed" else 0.4) / height,
+                            top=1 - (1.5 if mode == "fixed" else 1.0) / height,
                             wspace=0.28, hspace=0.36)
+        fig.suptitle(f"{display_label} — {mode.capitalize()} perturbation", y=1 - 0.08 / height,
+                     fontsize=15, fontweight="semibold")
+        fig.text(0.5, 1 - 0.43 / height, provenance_note, ha="center", va="top", fontsize=10)
         for row_index, game in enumerate(games):
             for col, metric in enumerate(METRICS):
                 ax = axes[row_index, col]
@@ -225,14 +321,21 @@ def draw_grid(series, games, algorithm, mode, output, formats, connect_stages):
                     ax.set_xlabel("Round" if mode == "fixed" else "Global iteration")
         if mode == "fixed":
             handles = [Line2D([0], [0], color=c, lw=2, label=rf"$\epsilon={float(e):g}$") for e, c in zip(EPSILONS, COLORS)]
-            fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.56, 1 - 0.05 / height), ncol=6, frameon=True)
+            fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.56, 1 - 0.73 / height), ncol=6, frameon=True)
+        # Raw filenames remain a stable processing interface; only visible
+        # labels and the sidecar manifest carry the display/provenance mapping.
         name = f"pefr.{algorithm}.round.gaps.alt.cfrplus" if mode == "fixed" else f"pefr.{algorithm}.adaptive.gaps"
         paths = []
         for extension in formats:
             path = output / mode / f"{name}.{extension}"
             path.parent.mkdir(parents=True, exist_ok=True)
-            fig.savefig(path, bbox_inches="tight", facecolor="white")
-            paths.append(str(path))
+            metadata = {
+                "pdf": {"Creator": None, "Producer": None, "CreationDate": None, "ModDate": None},
+                "svg": {"Creator": None, "Date": None},
+                "png": {"Software": None},
+            }[extension]
+            fig.savefig(path, bbox_inches="tight", facecolor="white", metadata=metadata)
+            paths.append(path.relative_to(output).as_posix())
             print(path, flush=True)
         plt.close(fig)
     return paths
@@ -251,6 +354,8 @@ def parse_args(argv=None):
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/figures"))
     parser.add_argument("--games", nargs="+", choices=GAMES, default=list(GAMES))
     parser.add_argument("--algorithms", nargs="+", choices=(*ALGORITHMS, *LABELS.values()), default=list(ALGORITHMS))
+    parser.add_argument("--label-mode", choices=("auto", "historical", "paper"), default="auto",
+                        help="Display provenance only; raw labels stay unchanged. auto uses bundled archive hashes or launch metadata, otherwise marks the mapping unverified. Explicit modes declare external family provenance, but cannot override contradictory evidence.")
     parser.add_argument("--formats", nargs="+", choices=("pdf", "png", "svg"), default=["pdf"])
     parser.add_argument("--max-points", type=int, default=100, help="Uniform fixed-curve sampling, 0 for all; first/last retained")
     parser.add_argument("--fixed-stride", type=int, default=100, help="Read every Nth round before curve sampling; 100 matches the paper notebook, 1 uses all rounds")
@@ -271,35 +376,41 @@ def main(argv=None):
     games = list(dict.fromkeys(args.games))
     if args.data_dir:
         fixed_dir, adaptive_dir = resolve(args.data_dir) / "fixed", resolve(args.data_dir) / "adaptive"
-    elif (ROOT / "data/raw/fixed").is_dir():
-        fixed_dir, adaptive_dir = ROOT / "data/raw/fixed", ROOT / "data/raw/adaptive"
     else:
-        # Source workspace: paper adaptive runs use decay 0.5, not root's 0.75.
-        fixed_dir = ROOT / "data_pbce"
-        adaptive_dir = fixed_dir / "data_pbce_gamma0d5"
+        fixed_dir, adaptive_dir = ROOT / "data/raw/fixed", ROOT / "data/raw/adaptive"
     fixed_dir = resolve(args.fixed_data) if args.fixed_data else fixed_dir
     adaptive_dir = resolve(args.adaptive_data) if args.adaptive_data else adaptive_dir
     output = resolve(args.output_dir)
-    report = {"schema_version": 1, "metric_interpretation": "historical implementation diagnostics; see implementation audit",
+    report = {"schema_version": 2, "metric_interpretation": "implementation diagnostics; family provenance does not certify full-continuation metric equivalence; see implementation audit",
               "fixed_normalization": "posr=fus/(t+1); osr=full/(t+1); csr=max_phi_regret",
               "adaptive_normalization": "use raw posr, osr, csr checkpoint columns",
+              "label_mode_request": args.label_mode,
+              "label_policy": "Raw data labels are unchanged; paper display names are not a claim that historical CFR/CFR_IN implement CF/CF-IN.",
               "max_fixed_points": args.max_points, "fixed_stride": args.fixed_stride, "connect_adaptive_stages": not args.disconnect_stages,
               "inputs": [], "figures": []}
     for mode in ("fixed", "adaptive"):
         if args.mode not in (mode, "both"):
             continue
         series = {}
+        contexts = []
         for game in games:
             for parameter in (EPSILONS if mode == "fixed" else ("adaptive",)):
                 path = find_input(fixed_dir if mode == "fixed" else adaptive_dir, game, parameter)
                 records, metadata = fixed_records(path, args.max_points, args.fixed_stride) if mode == "fixed" else adaptive_records(path)
+                context = label_provenance(path, args.label_mode)
+                contexts.append(context)
                 series[(game, parameter) if mode == "fixed" else game] = records
                 report["inputs"].append({"mode": mode, "game": game, "parameter": parameter,
-                    "path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), **metadata})
+                    "path": path.name, **context, **metadata})
                 print(f"Validated {path.name}", flush=True)
-        if not args.validate_only:
-            for algorithm in algorithms:
-                report["figures"].extend(draw_grid(series, games, algorithm, mode, output, args.formats, not args.disconnect_stages))
+        for algorithm in algorithms:
+            label_mode, note = figure_provenance(algorithm, contexts)
+            figure = {"mode": mode, "raw_label": algorithm, "display_label": LABELS[algorithm],
+                      "label_mode": label_mode, "provenance_note": note, "files": []}
+            if not args.validate_only:
+                figure["files"] = draw_grid(series, games, algorithm, mode, output, args.formats,
+                                            not args.disconnect_stages, contexts)
+            report["figures"].append(figure)
     output.mkdir(parents=True, exist_ok=True)
     (output / "plot_manifest.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return 0

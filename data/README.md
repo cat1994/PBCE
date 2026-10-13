@@ -6,7 +6,7 @@ This directory includes the complete raw metric records selected for the PBCE ma
 - `raw/adaptive/`: 5 runs with initial epsilon 0.1, decay factor 0.5, minimum epsilon 1e-10, and a maximum budget of 100,000 updates per algorithm.
 - `manifest.json`: relative source paths, raw and compressed SHA-256 digests, sizes, schemas, counts, adaptive terminal records, and checks against the original plotting arrays.
 
-The source project is `correlated_eq`. Fixed runs come from its `data_pbce/` root. Adaptive runs come specifically from `data_pbce/data_pbce_gamma0d5/`. The adaptive files in the source `data_pbce/` root use decay 0.75 and are excluded. Runs for other games, alternate solvers, duplicate arrays, logs, and backups are outside this manuscript dataset.
+The selected historical archive uses decay 0.5 for adaptive runs. Alternative decay-0.75 runs, other games, alternate solvers, duplicate arrays, logs, and backups are excluded. Relative source paths in the manifest identify the archived inputs without exposing an author repository.
 
 Each `.ssv.gz` can be read directly with Python `gzip.open(path, "rt")` or decompressed with `gzip -dk path.ssv.gz`. Gzip headers use zero modification time and no original filename. The manifest records both the compressed digest and the digest of the exact original `.ssv` bytes.
 
@@ -32,11 +32,11 @@ Fields such as `acsr`, normalized variants, and controller diagnostics are retai
 
 ## Relation to the original figures
 
-The source notebook is `notebooks/pefr_data_simple.ipynb`. Its fixed and adaptive input arrays are `results/results_pbce/pefr_data_fixed.npy` and `results/results_pbce/pefr_data_adaptive.npy` in the source project. Those arrays also contain games not selected by the paper; they are not needed to read this release's raw records.
+The historical plotting notebook used processed fixed and adaptive arrays, including games not selected by the paper. Those arrays are not needed to read this release's raw records. The checks below were completed when selecting the archived inputs.
 
 For the five manuscript games, all 150,000 fixed array rows were checked against the raw files. The six fields `value`, `milliseconds`, `posr`, `osr`, `csr`, and `acsr` agree exactly. All 44,194 adaptive array records match the selected decay-0.5 files by algorithm, record type, global iteration, and stage, with zero discrepancies in epsilon and the three plotted diagnostics at relative tolerance 1e-13 and absolute tolerance 1e-15.
 
-All ten current manuscript figure PDFs also match the server outputs under `results/results_pbce/fixed/` and `results/results_pbce/adaptive/` byte-for-byte by SHA-256. Their file digests are recorded in the manifest. The `adaptive/` figure-output directory is distinct from the excluded root raw-data directory; its figures use the verified decay-0.5 plotting array.
+All ten original manuscript figure PDFs matched the archived plotting outputs byte-for-byte by SHA-256. Their digests are recorded in the manifest. The adaptive figures use the verified decay-0.5 plotting array. Newly rendered figures retain those numerical conversions and sampling positions, but apply display-label mappings and provenance annotations; they are not expected to have the original PDF hashes.
 
 The historical fixed array keeps `t = 0, 100, ..., 99900`. The notebook then selects 100 evenly spaced indices from each resulting 1,000-point curve and plots against `t + 1`. Thus its plotted final fixed x value is 99,901, although the raw files extend to 100,000. To reproduce the historical plot sampling, apply both steps in this order. Plotting all raw points, or selecting 100 points directly from the raw files, gives a different sampling of the same run. The adaptive notebook plots all checkpoint rows and connects adjacent stages by default, with dashed stage-boundary markers. Nonpositive y values are hidden on logarithmic axes rather than replaced.
 
@@ -51,3 +51,7 @@ The source PBCE factory maps historical `CFR` to `CounterfactualPartialSequenceE
 In the inspected historical learner, reported regret maxima are formed from local regret tables; the fixed perturbed column uses the solver regret table. Stage metrics use stage-local tables. Successor memory probabilities are propagated using the stored execution-policy probabilities. The current manuscript distinguishes intended-memory weights, full continuation regret, and intended/realized empirical devices. Resolving these scientific differences requires a separately validated implementation and new experiments; this archive only preserves and reproduces the historical recorded diagnostics.
 
 The release launcher now provides `--legacy-algorithm-mapping` to select those historical classes explicitly; see [implementation status](../docs/IMPLEMENTATION_STATUS.md).
+
+Raw labels, processing keys, and figure filenames remain unchanged. Figure
+titles use the paper-name mapping, while historical `CFR` and `CFR_IN` figures
+explicitly flag the class difference. See [algorithm labels](../docs/ALGORITHM_LABELS.md).

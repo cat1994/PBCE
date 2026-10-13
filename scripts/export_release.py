@@ -11,7 +11,7 @@ from verify_release import verify
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "dist/pbce-release-20261013.zip")
+    parser.add_argument("--output", type=Path, default=ROOT / "dist/pbce-anonymous.zip")
     args = parser.parse_args()
     verify()
     output = args.output.resolve()
@@ -23,7 +23,7 @@ def main():
     try:
         with zipfile.ZipFile(temporary, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
             for path in files:
-                info = zipfile.ZipInfo("PBCE/" + path.relative_to(ROOT).as_posix(), date_time=(2026, 10, 13, 0, 0, 0))
+                info = zipfile.ZipInfo("PBCE/" + path.relative_to(ROOT).as_posix(), date_time=(1980, 1, 1, 0, 0, 0))
                 info.create_system = 3
                 info.external_attr = 0o100644 << 16
                 info.compress_type = zipfile.ZIP_STORED if path.suffix == ".gz" else zipfile.ZIP_DEFLATED

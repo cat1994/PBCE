@@ -5,7 +5,7 @@ CMAKE ?= cmake
 CTEST ?= ctest
 PYTHON ?= python3
 
-.PHONY: all configure build pbce test figures verify release help
+.PHONY: all configure build pbce test figures verify preflight release help
 all: build
 
 configure:
@@ -26,6 +26,9 @@ figures:
 verify:
 	$(PYTHON) scripts/verify_release.py
 
+preflight:
+	$(PYTHON) scripts/check_git_release.py
+
 release:
 	$(PYTHON) scripts/export_release.py
 
@@ -34,4 +37,5 @@ help:
 	@echo "make test        Run C++ tests, Python tests and integration smoke"
 	@echo "make figures     Redraw fixed/adaptive paper figures from bundled data"
 	@echo "make verify      Verify source and lossless raw-data checksums"
-	@echo "make release     Export the verified source/data release ZIP"
+	@echo "make preflight   Check the candidate Git release without staging or pushing"
+	@echo "make release     Optional ZIP export (not required for Git publication)"

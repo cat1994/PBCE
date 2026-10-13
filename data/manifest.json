@@ -2,7 +2,7 @@
   "schema_version": 1,
   "created_date": "2026-10-13",
   "description": "Complete historical raw metric records selected for the PBCE manuscript figures. Stored metric names are preserved and do not certify equivalence to the current manuscript definitions.",
-  "source_project": "correlated_eq",
+  "source_project": "anonymous historical experiment archive",
   "games": [
     "kuhn_3p",
     "leduc",

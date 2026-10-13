@@ -1,0 +1,1945 @@
+{
+  "schema_version": 1,
+  "created_date": "2026-10-13",
+  "description": "Complete historical raw metric records selected for the PBCE manuscript figures. Stored metric names are preserved and do not certify equivalence to the current manuscript definitions.",
+  "source_project": "correlated_eq",
+  "games": [
+    "kuhn_3p",
+    "leduc",
+    "random_goofspiel",
+    "sheriff",
+    "tiny_bridge"
+  ],
+  "algorithms": [
+    "A-EFR_IN",
+    "CSPS-EFR",
+    "CFPS-EFR",
+    "CFR",
+    "CFR_IN"
+  ],
+  "fixed_epsilon_grid": [
+    "1e-1",
+    "5e-2",
+    "1e-2",
+    "5e-3",
+    "1e-3",
+    "0"
+  ],
+  "adaptive_epsilon_decay": 0.5,
+  "gzip": {
+    "mtime": 0,
+    "filename": "",
+    "compresslevel": 6
+  },
+  "excluded": [
+    "Root data_pbce adaptive files use epsilon_decay=0.75, not the manuscript value 0.5.",
+    "Non-manuscript games, alternative solver/update variants, logs, duplicate NPY objects, and backups."
+  ],
+  "files": [
+    {
+      "path": "raw/fixed/pefr.kuhn_3p.null.sim.gen.1e-1.ssv.gz",
+      "source_path": "data_pbce/pefr.kuhn_3p.null.sim.gen.1e-1.ssv",
+      "game": "kuhn_3p",
+      "mode": "fixed",
+      "source_bytes": 32577887,
+      "source_sha256": "aadb2f0f91e8b534f546ab6e80bd6eaf5225963ebca83cfe39959a3fb66763dd",
+      "gzip_bytes": 5001970,
+      "gzip_sha256": "86279bdcc61bced9491a62258b756263544100f914f11e640e99c07afaeadacd",
+      "epsilon": 0.1,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.kuhn_3p.null.sim.gen.5e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.kuhn_3p.null.sim.gen.5e-2.ssv",
+      "game": "kuhn_3p",
+      "mode": "fixed",
+      "source_bytes": 33005901,
+      "source_sha256": "b6f3391326dca54deb58a4ff4c8040422eef686aa3f0390460cf5b4c0be5597f",
+      "gzip_bytes": 5302017,
+      "gzip_sha256": "524ca6f49c227faee2f9178a632e56db328291f686cc1da105dc636470effb6a",
+      "epsilon": 0.05,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.kuhn_3p.null.sim.gen.1e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.kuhn_3p.null.sim.gen.1e-2.ssv",
+      "game": "kuhn_3p",
+      "mode": "fixed",
+      "source_bytes": 33020383,
+      "source_sha256": "d967774d2c40a6c02230c71f716a234154a93c59ac454a836cafed0fbf47b1a7",
+      "gzip_bytes": 6634387,
+      "gzip_sha256": "d3684fe7ce2814442bc3a7c0ae29efa72f8bb2467c91fa9b594d9a25112ff9cb",
+      "epsilon": 0.01,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.kuhn_3p.null.sim.gen.5e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.kuhn_3p.null.sim.gen.5e-3.ssv",
+      "game": "kuhn_3p",
+      "mode": "fixed",
+      "source_bytes": 33054541,
+      "source_sha256": "fc49cb5026563c9097ba37d4b858c2907b4931f8f217bf33c510cde0aff7d39d",
+      "gzip_bytes": 6225147,
+      "gzip_sha256": "6fda5fc3b7c5532b004a472023c807d722c38d0180941f70bba9a86f951f82b2",
+      "epsilon": 0.005,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.kuhn_3p.null.sim.gen.1e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.kuhn_3p.null.sim.gen.1e-3.ssv",
+      "game": "kuhn_3p",
+      "mode": "fixed",
+      "source_bytes": 32964361,
+      "source_sha256": "92d35566b1832664d022bbe61c65fe744b9979707af356e073814629ae9ef029",
+      "gzip_bytes": 5474745,
+      "gzip_sha256": "e7ec3f53edb4bf6a6305c98f31a68ab883d3246a12c59be729aa5d857a18c178",
+      "epsilon": 0.001,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.kuhn_3p.null.sim.gen.0.ssv.gz",
+      "source_path": "data_pbce/pefr.kuhn_3p.null.sim.gen.0.ssv",
+      "game": "kuhn_3p",
+      "mode": "fixed",
+      "source_bytes": 30890925,
+      "source_sha256": "033aab12b77da0d85e3b674c9d1a00a6f361ddfe412910653358fdab39ca34c0",
+      "gzip_bytes": 3653178,
+      "gzip_sha256": "d75d844ea9822ae5c4b081433e39eeba3e8a5e39f034289f5e92071dd9823f3d",
+      "epsilon": 0.0,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.leduc.null.sim.gen.1e-1.ssv.gz",
+      "source_path": "data_pbce/pefr.leduc.null.sim.gen.1e-1.ssv",
+      "game": "leduc",
+      "mode": "fixed",
+      "source_bytes": 32708334,
+      "source_sha256": "5e2ce6700272e80b4a53eaccececd80434d481e5a9df59059ac5122474d12b5a",
+      "gzip_bytes": 5757242,
+      "gzip_sha256": "27d7b0818c4f52f638df78f8610f37bf25ebe2315716cd2d071a8ffd0b38720a",
+      "epsilon": 0.1,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.leduc.null.sim.gen.5e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.leduc.null.sim.gen.5e-2.ssv",
+      "game": "leduc",
+      "mode": "fixed",
+      "source_bytes": 32771777,
+      "source_sha256": "d22f60a5a81dbf01b9fb8c08c60b43edb058cab3de7ed8a9ee02e129e8aa505f",
+      "gzip_bytes": 6384215,
+      "gzip_sha256": "57439d702157831ce9732b8ab24a41d8504bfe76d7f553ad03339da23a693e0d",
+      "epsilon": 0.05,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.leduc.null.sim.gen.1e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.leduc.null.sim.gen.1e-2.ssv",
+      "game": "leduc",
+      "mode": "fixed",
+      "source_bytes": 32882701,
+      "source_sha256": "a9311b8ef1430f9ef6667a07ffe801dd205b73618039c2d82b4ccd530445e40f",
+      "gzip_bytes": 8274733,
+      "gzip_sha256": "46cb9459b9b4b0350a232b1ac86b6116bb2112170617a5c26009b1f4b10930ea",
+      "epsilon": 0.01,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.leduc.null.sim.gen.5e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.leduc.null.sim.gen.5e-3.ssv",
+      "game": "leduc",
+      "mode": "fixed",
+      "source_bytes": 32704928,
+      "source_sha256": "dae4aaa0f79b7e787d24f2021196dc3965d43327674d46fa204e6b1b2325b2cf",
+      "gzip_bytes": 8158459,
+      "gzip_sha256": "4bc7bbf8270ce36097abe6614b2c6e40e563603357032dfbb9faffc432d1d3c9",
+      "epsilon": 0.005,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.leduc.null.sim.gen.1e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.leduc.null.sim.gen.1e-3.ssv",
+      "game": "leduc",
+      "mode": "fixed",
+      "source_bytes": 32721325,
+      "source_sha256": "922c67c6f916b84affd052ed0432d032f78341b46c1b114d62034577fa81726f",
+      "gzip_bytes": 7165731,
+      "gzip_sha256": "cfe6356a01bc44cfee23125b9f4ee4ca581dfa3f53771d485598b3bf0f141ece",
+      "epsilon": 0.001,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.leduc.null.sim.gen.0.ssv.gz",
+      "source_path": "data_pbce/pefr.leduc.null.sim.gen.0.ssv",
+      "game": "leduc",
+      "mode": "fixed",
+      "source_bytes": 30670062,
+      "source_sha256": "1e4c0a22c7685ba64de737c9865e2d12dd6f6a485a2f6bb9fe3c25f5ff6efd19",
+      "gzip_bytes": 4040141,
+      "gzip_sha256": "414da8410f24b9d871077e293f857f5726be0e6e0fdfc6b26fe3c8f51c7a01b5",
+      "epsilon": 0.0,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.random_goofspiel.null.sim.gen.1e-1.ssv.gz",
+      "source_path": "data_pbce/pefr.random_goofspiel.null.sim.gen.1e-1.ssv",
+      "game": "random_goofspiel",
+      "mode": "fixed",
+      "source_bytes": 33610042,
+      "source_sha256": "2dd221bf98a345dd226725b627492e1183d17062be59c8dcdaf36a837c07cb53",
+      "gzip_bytes": 6661879,
+      "gzip_sha256": "0f76c8737fcb1b93b268fbdb530bff1781086ab973f40ea72ed086f06a06b39a",
+      "epsilon": 0.1,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.random_goofspiel.null.sim.gen.5e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.random_goofspiel.null.sim.gen.5e-2.ssv",
+      "game": "random_goofspiel",
+      "mode": "fixed",
+      "source_bytes": 33604555,
+      "source_sha256": "7f703396f0a81e45797f8b7b822533ab8d0ef083625aab8f6c390decc592192f",
+      "gzip_bytes": 7369814,
+      "gzip_sha256": "31b9b7c7443f71c724ddf8675d29b7869ead2613fedba2e017c92e334fdff04e",
+      "epsilon": 0.05,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.random_goofspiel.null.sim.gen.1e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.random_goofspiel.null.sim.gen.1e-2.ssv",
+      "game": "random_goofspiel",
+      "mode": "fixed",
+      "source_bytes": 33239405,
+      "source_sha256": "687c1cc3e7f806889b1652e2c63b640d293c35cd4d800b5e44305181d5aaf83c",
+      "gzip_bytes": 7864286,
+      "gzip_sha256": "2971e58f307fff627b0569890b3cf931024b69a6d5b5afd482db87dd396b2115",
+      "epsilon": 0.01,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.random_goofspiel.null.sim.gen.5e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.random_goofspiel.null.sim.gen.5e-3.ssv",
+      "game": "random_goofspiel",
+      "mode": "fixed",
+      "source_bytes": 33159353,
+      "source_sha256": "47c81112105753770245822cd5395f08f2bfa38d9b467849e5ea97a2360f8dc3",
+      "gzip_bytes": 7386600,
+      "gzip_sha256": "e7c3463c2ef23996e9f13d6f369d16e60ef65c05968b84c628ff2ec9c3152240",
+      "epsilon": 0.005,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.random_goofspiel.null.sim.gen.1e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.random_goofspiel.null.sim.gen.1e-3.ssv",
+      "game": "random_goofspiel",
+      "mode": "fixed",
+      "source_bytes": 33091132,
+      "source_sha256": "d27c47b20fc123654c92c794de6eecc0d8efe42bab7a3d864d73a7a0c4575056",
+      "gzip_bytes": 6970414,
+      "gzip_sha256": "498bde29a8495aa0a7eddf0dee245e67a0686949e8a2eba21ac59dff11fd968f",
+      "epsilon": 0.001,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.random_goofspiel.null.sim.gen.0.ssv.gz",
+      "source_path": "data_pbce/pefr.random_goofspiel.null.sim.gen.0.ssv",
+      "game": "random_goofspiel",
+      "mode": "fixed",
+      "source_bytes": 32493280,
+      "source_sha256": "815c412255295c3b5ff70537bf62f210be15ad77865a4142921653146130766d",
+      "gzip_bytes": 4868604,
+      "gzip_sha256": "e6fbf7e52182b5b0c1e8944c8fd563dbac50b8a7c76dc308ced569bc51e42e02",
+      "epsilon": 0.0,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.sheriff.null.sim.gen.1e-1.ssv.gz",
+      "source_path": "data_pbce/pefr.sheriff.null.sim.gen.1e-1.ssv",
+      "game": "sheriff",
+      "mode": "fixed",
+      "source_bytes": 31030063,
+      "source_sha256": "c29a06b8b30f9314d7cd4112009bb70063c53a7d41ab70f563e1ca1183a4cafc",
+      "gzip_bytes": 4520618,
+      "gzip_sha256": "88347357bae4d7d4ac1bc124cb9b9045af9a3ead5e31d73f91ddc3308e6a22c6",
+      "epsilon": 0.1,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.sheriff.null.sim.gen.5e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.sheriff.null.sim.gen.5e-2.ssv",
+      "game": "sheriff",
+      "mode": "fixed",
+      "source_bytes": 31098252,
+      "source_sha256": "0ab6e9da5105f94c7da31d1d73201642077510a6300474388c3b5169b82c8b1b",
+      "gzip_bytes": 5500197,
+      "gzip_sha256": "ccf7e0358e592df59108e9327bc16a98b25c59e6d8cb9853424069d03322ebb8",
+      "epsilon": 0.05,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.sheriff.null.sim.gen.1e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.sheriff.null.sim.gen.1e-2.ssv",
+      "game": "sheriff",
+      "mode": "fixed",
+      "source_bytes": 31291553,
+      "source_sha256": "8bb31a9dc8544859ffbe9acb89447e80803beca99645f3126d40416b24092dd0",
+      "gzip_bytes": 6624708,
+      "gzip_sha256": "c3d4e1a7dbad2af72244091d158571b4f85fb19848149dd4993ae830068a2324",
+      "epsilon": 0.01,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.sheriff.null.sim.gen.5e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.sheriff.null.sim.gen.5e-3.ssv",
+      "game": "sheriff",
+      "mode": "fixed",
+      "source_bytes": 31130468,
+      "source_sha256": "042de076771b8063aba4ea4d8cbf4d31822ec35d8f5bcbc68a36a22be68c3859",
+      "gzip_bytes": 7222730,
+      "gzip_sha256": "a924f0c356e6c2fc0971aebb4e0fd28f091a571304972d0a4e0d08f234aac237",
+      "epsilon": 0.005,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.sheriff.null.sim.gen.1e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.sheriff.null.sim.gen.1e-3.ssv",
+      "game": "sheriff",
+      "mode": "fixed",
+      "source_bytes": 30809333,
+      "source_sha256": "74f376e1a73e46960e8c7ba1e58dde2472c5814e0d1bd71fc123d5ccd5e47580",
+      "gzip_bytes": 7053993,
+      "gzip_sha256": "b4156e14a11057e93bb84600de993f36cbba6c806f95a90c9da62f34c5084523",
+      "epsilon": 0.001,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.sheriff.null.sim.gen.0.ssv.gz",
+      "source_path": "data_pbce/pefr.sheriff.null.sim.gen.0.ssv",
+      "game": "sheriff",
+      "mode": "fixed",
+      "source_bytes": 30567142,
+      "source_sha256": "97b26bf23a637bc71b2b7e936692620e17c9e736bde0dd91cb0cedf4ae981929",
+      "gzip_bytes": 4347019,
+      "gzip_sha256": "d4a7203916342b46ecfb844c22221f1e1c672e8c2ea61733fcc8672c11c007b0",
+      "epsilon": 0.0,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.tiny_bridge.null.sim.gen.1e-1.ssv.gz",
+      "source_path": "data_pbce/pefr.tiny_bridge.null.sim.gen.1e-1.ssv",
+      "game": "tiny_bridge",
+      "mode": "fixed",
+      "source_bytes": 31256695,
+      "source_sha256": "5cd7f97cd696c3fa7a69198734535cf74518c248d1e7ea88c3e90a5081c66fad",
+      "gzip_bytes": 2253796,
+      "gzip_sha256": "c2f89a2c51bfc24105b67ebd44729aa444f3c71fca5c927543c6a5757d4444a1",
+      "epsilon": 0.1,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.tiny_bridge.null.sim.gen.5e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.tiny_bridge.null.sim.gen.5e-2.ssv",
+      "game": "tiny_bridge",
+      "mode": "fixed",
+      "source_bytes": 29689714,
+      "source_sha256": "747eb11e5c87adc82063224a625b58f9e3e3c3931cf1cd2a627faa2c3d34a81c",
+      "gzip_bytes": 2464653,
+      "gzip_sha256": "54d34dcf5c8b117ce2813f94d80753acd7c43fa4ffa06ca5cc5c9ef92a2d9448",
+      "epsilon": 0.05,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.tiny_bridge.null.sim.gen.1e-2.ssv.gz",
+      "source_path": "data_pbce/pefr.tiny_bridge.null.sim.gen.1e-2.ssv",
+      "game": "tiny_bridge",
+      "mode": "fixed",
+      "source_bytes": 30705281,
+      "source_sha256": "6fd721c146b5ac0073c2191acd5231a5db16f39ff24b81799a46f4ebb4228d7c",
+      "gzip_bytes": 3611884,
+      "gzip_sha256": "9e23b648f79ba5cab4717ef16e680fad02f70b70a288e6a0afe617aef3ba9593",
+      "epsilon": 0.01,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.tiny_bridge.null.sim.gen.5e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.tiny_bridge.null.sim.gen.5e-3.ssv",
+      "game": "tiny_bridge",
+      "mode": "fixed",
+      "source_bytes": 30609535,
+      "source_sha256": "4a5cfb130a56dd65817442bab87863003df77bdc65d77346f1120b86e0566bed",
+      "gzip_bytes": 3944661,
+      "gzip_sha256": "afc468c3d1c11e2c3aad09c9198730bff42dc7fd81e4d94a10801599fb5a6652",
+      "epsilon": 0.005,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.tiny_bridge.null.sim.gen.1e-3.ssv.gz",
+      "source_path": "data_pbce/pefr.tiny_bridge.null.sim.gen.1e-3.ssv",
+      "game": "tiny_bridge",
+      "mode": "fixed",
+      "source_bytes": 30657401,
+      "source_sha256": "6f3b4ecf5c22c418a3d1c5aa865f8c99978b125db5328898dec0e70b2080db51",
+      "gzip_bytes": 4209936,
+      "gzip_sha256": "76575387398cca65d4f4ce5de31d226c55e3ea4df32aeb43ad51111c96303bc5",
+      "epsilon": 0.001,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/fixed/pefr.tiny_bridge.null.sim.gen.0.ssv.gz",
+      "source_path": "data_pbce/pefr.tiny_bridge.null.sim.gen.0.ssv",
+      "game": "tiny_bridge",
+      "mode": "fixed",
+      "source_bytes": 30330020,
+      "source_sha256": "271083f13cddd43ed1b9674a3fd501822385ca6e9bef55aabce291081a97b81d",
+      "gzip_bytes": 794848,
+      "gzip_sha256": "3e206c5fc42f08c8c78984a61ebea6f2d3d476ffebfd615b8096c2d83a19115a",
+      "epsilon": 0.0,
+      "format": "legacy fixed text blocks",
+      "header": "algorithm  (ev, milliseconds, max_full_phi_regrets_fus, max_full_phi_regret, max_phi_regret, sum_phi_regret)",
+      "tuple_columns": [
+        "ev",
+        "milliseconds",
+        "max_full_phi_regrets_fus",
+        "max_full_phi_regret",
+        "max_phi_regret",
+        "sum_phi_regret"
+      ],
+      "record_count": 500000,
+      "records_per_algorithm": {
+        "A-EFR_IN": 100000,
+        "CSPS-EFR": 100000,
+        "CFPS-EFR": 100000,
+        "CFR": 100000,
+        "CFR_IN": 100000
+      },
+      "iteration_count": 100000,
+      "t_min": 0,
+      "t_max": 99999,
+      "metric_mapping": {
+        "posr": "max_full_phi_regrets_fus / (t + 1)",
+        "osr": "max_full_phi_regret / (t + 1)",
+        "csr": "max_phi_regret"
+      }
+    },
+    {
+      "path": "raw/adaptive/pefr.kuhn_3p.null.sim.gen.adaptive.ssv.gz",
+      "source_path": "data_pbce/data_pbce_gamma0d5/pefr.kuhn_3p.null.sim.gen.adaptive.ssv",
+      "game": "kuhn_3p",
+      "mode": "adaptive",
+      "source_bytes": 8465432,
+      "source_sha256": "0b017dc03a4494e7aa64416f5a103e5b4b6b35575eb18e8c175eb01ecd50795b",
+      "gzip_bytes": 2120914,
+      "gzip_sha256": "2e9e142eba2b1862d22c2171a1bec0f9dcc227bfffb2390c30432af13ee3ab92",
+      "format": "CSV (historical .ssv suffix)",
+      "columns": [
+        "record_type",
+        "algorithm",
+        "global_t",
+        "epsilon_stage",
+        "stage_k",
+        "stage_t",
+        "stage_round",
+        "epsilon",
+        "epsilon_changed",
+        "posr",
+        "osr",
+        "csr",
+        "acsr",
+        "posr_norm",
+        "osr_norm",
+        "csr_norm",
+        "w_min",
+        "w_min_positive",
+        "w_mean",
+        "w_max",
+        "w_at_max_csr",
+        "num_zero_or_tiny_W",
+        "osr_window_old",
+        "osr_window_new",
+        "csr_window_old",
+        "csr_window_new",
+        "osr_relative_change",
+        "csr_relative_change",
+        "osr_relative_variation",
+        "csr_relative_variation",
+        "osr_stable",
+        "csr_stable",
+        "response_osr_ref",
+        "response_csr_ref",
+        "osr_abs_response",
+        "osr_response",
+        "csr_response",
+        "osr_direction_ok",
+        "csr_direction_ok",
+        "max_osr_response",
+        "max_csr_response",
+        "required_csr_response",
+        "response_ratio",
+        "osr_response_ready",
+        "csr_response_ready",
+        "response_ready",
+        "enough_history",
+        "enough_stage_iterations",
+        "quality_anchor_osr",
+        "quality_anchor_csr",
+        "current_quality_osr",
+        "current_quality_csr",
+        "osr_quality_ratio",
+        "csr_quality_ratio",
+        "osr_quality_safe",
+        "csr_quality_safe",
+        "quality_safe",
+        "quality_anchor_updated",
+        "stage_ready",
+        "stable_count",
+        "stage_certified",
+        "milliseconds",
+        "old_epsilon",
+        "new_epsilon",
+        "status"
+      ],
+      "record_count": 10137,
+      "records_per_algorithm": {
+        "A-EFR_IN": 2027,
+        "CSPS-EFR": 2029,
+        "CFPS-EFR": 2027,
+        "CFR": 2027,
+        "CFR_IN": 2027
+      },
+      "record_types": {
+        "CHECKPOINT": 10000,
+        "STAGE_END": 66,
+        "EPSILON_UPDATE": 66,
+        "RUN_END": 5
+      },
+      "checkpoint_records_per_algorithm": {
+        "A-EFR_IN": 2000,
+        "CSPS-EFR": 2000,
+        "CFPS-EFR": 2000,
+        "CFR": 2000,
+        "CFR_IN": 2000
+      },
+      "terminal_records": {
+        "A-EFR_IN": {
+          "global_t": 100000,
+          "epsilon": 1.220703125e-05,
+          "stage_k": 13,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CSPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 6.103515625e-06,
+          "stage_k": 14,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 1.220703125e-05,
+          "stage_k": 13,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR": {
+          "global_t": 100000,
+          "epsilon": 1.220703125e-05,
+          "stage_k": 13,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR_IN": {
+          "global_t": 100000,
+          "epsilon": 1.220703125e-05,
+          "stage_k": 13,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        }
+      },
+      "metric_mapping": {
+        "posr": "posr (already stage-normalized)",
+        "osr": "osr (already stage-normalized)",
+        "csr": "csr"
+      }
+    },
+    {
+      "path": "raw/adaptive/pefr.leduc.null.sim.gen.adaptive.ssv.gz",
+      "source_path": "data_pbce/data_pbce_gamma0d5/pefr.leduc.null.sim.gen.adaptive.ssv",
+      "game": "leduc",
+      "mode": "adaptive",
+      "source_bytes": 8347007,
+      "source_sha256": "15f1c9b7aae21b9226a86644313ca8765d1cc83eb1ce138762a45bc6c59f7c69",
+      "gzip_bytes": 2263629,
+      "gzip_sha256": "a7c6d74de5c41b4cdca99833b086efb66da379980bf5a632c8715e372d919bc5",
+      "format": "CSV (historical .ssv suffix)",
+      "columns": [
+        "record_type",
+        "algorithm",
+        "global_t",
+        "epsilon_stage",
+        "stage_k",
+        "stage_t",
+        "stage_round",
+        "epsilon",
+        "epsilon_changed",
+        "posr",
+        "osr",
+        "csr",
+        "acsr",
+        "posr_norm",
+        "osr_norm",
+        "csr_norm",
+        "w_min",
+        "w_min_positive",
+        "w_mean",
+        "w_max",
+        "w_at_max_csr",
+        "num_zero_or_tiny_W",
+        "osr_window_old",
+        "osr_window_new",
+        "csr_window_old",
+        "csr_window_new",
+        "osr_relative_change",
+        "csr_relative_change",
+        "osr_relative_variation",
+        "csr_relative_variation",
+        "osr_stable",
+        "csr_stable",
+        "response_osr_ref",
+        "response_csr_ref",
+        "osr_abs_response",
+        "osr_response",
+        "csr_response",
+        "osr_direction_ok",
+        "csr_direction_ok",
+        "max_osr_response",
+        "max_csr_response",
+        "required_csr_response",
+        "response_ratio",
+        "osr_response_ready",
+        "csr_response_ready",
+        "response_ready",
+        "enough_history",
+        "enough_stage_iterations",
+        "quality_anchor_osr",
+        "quality_anchor_csr",
+        "current_quality_osr",
+        "current_quality_csr",
+        "osr_quality_ratio",
+        "csr_quality_ratio",
+        "osr_quality_safe",
+        "csr_quality_safe",
+        "quality_safe",
+        "quality_anchor_updated",
+        "stage_ready",
+        "stable_count",
+        "stage_certified",
+        "milliseconds",
+        "old_epsilon",
+        "new_epsilon",
+        "status"
+      ],
+      "record_count": 10105,
+      "records_per_algorithm": {
+        "A-EFR_IN": 2009,
+        "CSPS-EFR": 2023,
+        "CFPS-EFR": 2025,
+        "CFR": 2025,
+        "CFR_IN": 2023
+      },
+      "record_types": {
+        "CHECKPOINT": 10000,
+        "STAGE_END": 50,
+        "EPSILON_UPDATE": 50,
+        "RUN_END": 5
+      },
+      "checkpoint_records_per_algorithm": {
+        "A-EFR_IN": 2000,
+        "CSPS-EFR": 2000,
+        "CFPS-EFR": 2000,
+        "CFR": 2000,
+        "CFR_IN": 2000
+      },
+      "terminal_records": {
+        "A-EFR_IN": {
+          "global_t": 100000,
+          "epsilon": 0.00625,
+          "stage_k": 4,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CSPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 4.8828125e-05,
+          "stage_k": 11,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 2.44140625e-05,
+          "stage_k": 12,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR": {
+          "global_t": 100000,
+          "epsilon": 2.44140625e-05,
+          "stage_k": 12,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR_IN": {
+          "global_t": 100000,
+          "epsilon": 4.8828125e-05,
+          "stage_k": 11,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        }
+      },
+      "metric_mapping": {
+        "posr": "posr (already stage-normalized)",
+        "osr": "osr (already stage-normalized)",
+        "csr": "csr"
+      }
+    },
+    {
+      "path": "raw/adaptive/pefr.random_goofspiel.null.sim.gen.adaptive.ssv.gz",
+      "source_path": "data_pbce/data_pbce_gamma0d5/pefr.random_goofspiel.null.sim.gen.adaptive.ssv",
+      "game": "random_goofspiel",
+      "mode": "adaptive",
+      "source_bytes": 8024481,
+      "source_sha256": "38a92d09a169ed956c05b178782e7a33721001c798307e069311c9aba0cc0e3b",
+      "gzip_bytes": 2196210,
+      "gzip_sha256": "95086817ac29bea46398e1398ff882220cb0eea967ebb763637319ccefaf7394",
+      "format": "CSV (historical .ssv suffix)",
+      "columns": [
+        "record_type",
+        "algorithm",
+        "global_t",
+        "epsilon_stage",
+        "stage_k",
+        "stage_t",
+        "stage_round",
+        "epsilon",
+        "epsilon_changed",
+        "posr",
+        "osr",
+        "csr",
+        "acsr",
+        "posr_norm",
+        "osr_norm",
+        "csr_norm",
+        "w_min",
+        "w_min_positive",
+        "w_mean",
+        "w_max",
+        "w_at_max_csr",
+        "num_zero_or_tiny_W",
+        "osr_window_old",
+        "osr_window_new",
+        "csr_window_old",
+        "csr_window_new",
+        "osr_relative_change",
+        "csr_relative_change",
+        "osr_relative_variation",
+        "csr_relative_variation",
+        "osr_stable",
+        "csr_stable",
+        "response_osr_ref",
+        "response_csr_ref",
+        "osr_abs_response",
+        "osr_response",
+        "csr_response",
+        "osr_direction_ok",
+        "csr_direction_ok",
+        "max_osr_response",
+        "max_csr_response",
+        "required_csr_response",
+        "response_ratio",
+        "osr_response_ready",
+        "csr_response_ready",
+        "response_ready",
+        "enough_history",
+        "enough_stage_iterations",
+        "quality_anchor_osr",
+        "quality_anchor_csr",
+        "current_quality_osr",
+        "current_quality_csr",
+        "osr_quality_ratio",
+        "csr_quality_ratio",
+        "osr_quality_safe",
+        "csr_quality_safe",
+        "quality_safe",
+        "quality_anchor_updated",
+        "stage_ready",
+        "stable_count",
+        "stage_certified",
+        "milliseconds",
+        "old_epsilon",
+        "new_epsilon",
+        "status"
+      ],
+      "record_count": 10059,
+      "records_per_algorithm": {
+        "A-EFR_IN": 2007,
+        "CSPS-EFR": 2013,
+        "CFPS-EFR": 2013,
+        "CFR": 2013,
+        "CFR_IN": 2013
+      },
+      "record_types": {
+        "CHECKPOINT": 10000,
+        "STAGE_END": 27,
+        "EPSILON_UPDATE": 27,
+        "RUN_END": 5
+      },
+      "checkpoint_records_per_algorithm": {
+        "A-EFR_IN": 2000,
+        "CSPS-EFR": 2000,
+        "CFPS-EFR": 2000,
+        "CFR": 2000,
+        "CFR_IN": 2000
+      },
+      "terminal_records": {
+        "A-EFR_IN": {
+          "global_t": 100000,
+          "epsilon": 0.0125,
+          "stage_k": 3,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CSPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 0.0015625,
+          "stage_k": 6,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 0.0015625,
+          "stage_k": 6,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR": {
+          "global_t": 100000,
+          "epsilon": 0.0015625,
+          "stage_k": 6,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR_IN": {
+          "global_t": 100000,
+          "epsilon": 0.0015625,
+          "stage_k": 6,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        }
+      },
+      "metric_mapping": {
+        "posr": "posr (already stage-normalized)",
+        "osr": "osr (already stage-normalized)",
+        "csr": "csr"
+      }
+    },
+    {
+      "path": "raw/adaptive/pefr.sheriff.null.sim.gen.adaptive.ssv.gz",
+      "source_path": "data_pbce/data_pbce_gamma0d5/pefr.sheriff.null.sim.gen.adaptive.ssv",
+      "game": "sheriff",
+      "mode": "adaptive",
+      "source_bytes": 8285091,
+      "source_sha256": "e61bb18db8ac3dfcb6dbb19ef27a3bd9bb6f3f32a65e6325bb9f094bb7d299b2",
+      "gzip_bytes": 2176180,
+      "gzip_sha256": "6ee69e607d67650b6df2937fe23627d21538c753eacef74218b549cec5030e3d",
+      "format": "CSV (historical .ssv suffix)",
+      "columns": [
+        "record_type",
+        "algorithm",
+        "global_t",
+        "epsilon_stage",
+        "stage_k",
+        "stage_t",
+        "stage_round",
+        "epsilon",
+        "epsilon_changed",
+        "posr",
+        "osr",
+        "csr",
+        "acsr",
+        "posr_norm",
+        "osr_norm",
+        "csr_norm",
+        "w_min",
+        "w_min_positive",
+        "w_mean",
+        "w_max",
+        "w_at_max_csr",
+        "num_zero_or_tiny_W",
+        "osr_window_old",
+        "osr_window_new",
+        "csr_window_old",
+        "csr_window_new",
+        "osr_relative_change",
+        "csr_relative_change",
+        "osr_relative_variation",
+        "csr_relative_variation",
+        "osr_stable",
+        "csr_stable",
+        "response_osr_ref",
+        "response_csr_ref",
+        "osr_abs_response",
+        "osr_response",
+        "csr_response",
+        "osr_direction_ok",
+        "csr_direction_ok",
+        "max_osr_response",
+        "max_csr_response",
+        "required_csr_response",
+        "response_ratio",
+        "osr_response_ready",
+        "csr_response_ready",
+        "response_ready",
+        "enough_history",
+        "enough_stage_iterations",
+        "quality_anchor_osr",
+        "quality_anchor_csr",
+        "current_quality_osr",
+        "current_quality_csr",
+        "osr_quality_ratio",
+        "csr_quality_ratio",
+        "osr_quality_safe",
+        "csr_quality_safe",
+        "quality_safe",
+        "quality_anchor_updated",
+        "stage_ready",
+        "stable_count",
+        "stage_certified",
+        "milliseconds",
+        "old_epsilon",
+        "new_epsilon",
+        "status"
+      ],
+      "record_count": 10141,
+      "records_per_algorithm": {
+        "A-EFR_IN": 2019,
+        "CSPS-EFR": 2039,
+        "CFPS-EFR": 2027,
+        "CFR": 2029,
+        "CFR_IN": 2027
+      },
+      "record_types": {
+        "CHECKPOINT": 10000,
+        "STAGE_END": 68,
+        "EPSILON_UPDATE": 68,
+        "RUN_END": 5
+      },
+      "checkpoint_records_per_algorithm": {
+        "A-EFR_IN": 2000,
+        "CSPS-EFR": 2000,
+        "CFPS-EFR": 2000,
+        "CFR": 2000,
+        "CFR_IN": 2000
+      },
+      "terminal_records": {
+        "A-EFR_IN": {
+          "global_t": 100000,
+          "epsilon": 0.0001953125,
+          "stage_k": 9,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CSPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 1.9073486328125e-07,
+          "stage_k": 19,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFPS-EFR": {
+          "global_t": 100000,
+          "epsilon": 1.220703125e-05,
+          "stage_k": 13,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR": {
+          "global_t": 100000,
+          "epsilon": 6.103515625e-06,
+          "stage_k": 14,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CFR_IN": {
+          "global_t": 100000,
+          "epsilon": 1.220703125e-05,
+          "stage_k": 13,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        }
+      },
+      "metric_mapping": {
+        "posr": "posr (already stage-normalized)",
+        "osr": "osr (already stage-normalized)",
+        "csr": "csr"
+      }
+    },
+    {
+      "path": "raw/adaptive/pefr.tiny_bridge.null.sim.gen.adaptive.ssv.gz",
+      "source_path": "data_pbce/data_pbce_gamma0d5/pefr.tiny_bridge.null.sim.gen.adaptive.ssv",
+      "game": "tiny_bridge",
+      "mode": "adaptive",
+      "source_bytes": 2869946,
+      "source_sha256": "178dbdeb4b4517e14efc9f79187d452dedf59661bb5352a7dd2f0c489d77429c",
+      "gzip_bytes": 726697,
+      "gzip_sha256": "f35b9d1872505f05186ea35c07a00eb4c004a99246c41cf98e0395bd95c13fe3",
+      "format": "CSV (historical .ssv suffix)",
+      "columns": [
+        "record_type",
+        "algorithm",
+        "global_t",
+        "epsilon_stage",
+        "stage_k",
+        "stage_t",
+        "stage_round",
+        "epsilon",
+        "epsilon_changed",
+        "posr",
+        "osr",
+        "csr",
+        "acsr",
+        "posr_norm",
+        "osr_norm",
+        "csr_norm",
+        "w_min",
+        "w_min_positive",
+        "w_mean",
+        "w_max",
+        "w_at_max_csr",
+        "num_zero_or_tiny_W",
+        "osr_window_old",
+        "osr_window_new",
+        "csr_window_old",
+        "csr_window_new",
+        "osr_relative_change",
+        "csr_relative_change",
+        "osr_relative_variation",
+        "csr_relative_variation",
+        "osr_stable",
+        "csr_stable",
+        "response_osr_ref",
+        "response_csr_ref",
+        "osr_abs_response",
+        "osr_response",
+        "csr_response",
+        "osr_direction_ok",
+        "csr_direction_ok",
+        "max_osr_response",
+        "max_csr_response",
+        "required_csr_response",
+        "response_ratio",
+        "osr_response_ready",
+        "csr_response_ready",
+        "response_ready",
+        "enough_history",
+        "enough_stage_iterations",
+        "quality_anchor_osr",
+        "quality_anchor_csr",
+        "current_quality_osr",
+        "current_quality_csr",
+        "osr_quality_ratio",
+        "csr_quality_ratio",
+        "osr_quality_safe",
+        "csr_quality_safe",
+        "quality_safe",
+        "quality_anchor_updated",
+        "stage_ready",
+        "stable_count",
+        "stage_certified",
+        "milliseconds",
+        "old_epsilon",
+        "new_epsilon",
+        "status"
+      ],
+      "record_count": 3752,
+      "records_per_algorithm": {
+        "A-EFR_IN": 2011,
+        "CSPS-EFR": 434,
+        "CFPS-EFR": 434,
+        "CFR": 434,
+        "CFR_IN": 439
+      },
+      "record_types": {
+        "CHECKPOINT": 3493,
+        "STAGE_END": 129,
+        "EPSILON_UPDATE": 125,
+        "RUN_END": 5
+      },
+      "checkpoint_records_per_algorithm": {
+        "A-EFR_IN": 2000,
+        "CSPS-EFR": 372,
+        "CFPS-EFR": 372,
+        "CFR": 372,
+        "CFR_IN": 377
+      },
+      "terminal_records": {
+        "A-EFR_IN": {
+          "global_t": 100000,
+          "epsilon": 0.003125,
+          "stage_k": 5,
+          "status": "MAX_GLOBAL_ITER",
+          "stage_certified": false
+        },
+        "CSPS-EFR": {
+          "global_t": 18600,
+          "epsilon": 1e-10,
+          "stage_k": 30,
+          "status": "CERTIFIED_FINAL",
+          "stage_certified": true
+        },
+        "CFPS-EFR": {
+          "global_t": 18600,
+          "epsilon": 1e-10,
+          "stage_k": 30,
+          "status": "CERTIFIED_FINAL",
+          "stage_certified": true
+        },
+        "CFR": {
+          "global_t": 18600,
+          "epsilon": 1e-10,
+          "stage_k": 30,
+          "status": "CERTIFIED_FINAL",
+          "stage_certified": true
+        },
+        "CFR_IN": {
+          "global_t": 18850,
+          "epsilon": 1e-10,
+          "stage_k": 30,
+          "status": "CERTIFIED_FINAL",
+          "stage_certified": true
+        }
+      },
+      "metric_mapping": {
+        "posr": "posr (already stage-normalized)",
+        "osr": "osr (already stage-normalized)",
+        "csr": "csr"
+      }
+    }
+  ],
+  "total_files": 35,
+  "total_source_bytes": 994338306,
+  "total_gzip_bytes": 175226235,
+  "total_records": 15044194,
+  "plot_source_verification": {
+    "notebook": "notebooks/pefr_data_simple.ipynb",
+    "notebook_sha256": "e88190474776288a7e2890b7b229716af2db7b23cd190db763e8742c6a5975ff",
+    "fixed_npy": {
+      "source_path": "results/results_pbce/pefr_data_fixed.npy",
+      "sha256": "1c53b0f03da48f2a7adafb85c3926ac916c61a446744d16847e0345ee0af24e5",
+      "verified_manuscript_rows": 150000,
+      "sample_t": "0, 100, ..., 99900",
+      "compared_columns": [
+        "value",
+        "milliseconds",
+        "posr",
+        "osr",
+        "csr",
+        "acsr"
+      ],
+      "comparison": "Exact equality against corresponding raw records; zero mismatches."
+    },
+    "adaptive_npy": {
+      "source_path": "results/results_pbce/pefr_data_adaptive.npy",
+      "sha256": "820828c640eaffe13cd5a594318146b4221d83f454515aae024f72c48708a342",
+      "verified_manuscript_rows": 44194,
+      "compared_columns": [
+        "epsilon",
+        "posr",
+        "osr",
+        "csr"
+      ],
+      "comparison": "All corresponding raw keys matched; zero mismatches at relative tolerance 1e-13 and absolute tolerance 1e-15."
+    },
+    "manuscript_figures": {
+      "comparison": "All ten figure PDFs in the current PBCE manuscript checkout match these server files byte-for-byte by SHA-256.",
+      "files": [
+        {
+          "source_path": "results/results_pbce/fixed/pefr.A-EFR_IN.round.gaps.alt.cfrplus.pdf",
+          "sha256": "8fafa1109e71b4efcbf9cf67080c42272596ff0aae3825508efe2ba4ab44bb4a",
+          "bytes": 101700
+        },
+        {
+          "source_path": "results/results_pbce/fixed/pefr.CFPS-EFR.round.gaps.alt.cfrplus.pdf",
+          "sha256": "f19cdbbd59493e228435dfafd166e559d8bc765c7ab33ec553bda1c6569b83e2",
+          "bytes": 101913
+        },
+        {
+          "source_path": "results/results_pbce/fixed/pefr.CFR.round.gaps.alt.cfrplus.pdf",
+          "sha256": "8c79a7e566005ec73f0aea144ffba05cd67e0457b86f66faebd8020b89edb174",
+          "bytes": 102199
+        },
+        {
+          "source_path": "results/results_pbce/fixed/pefr.CFR_IN.round.gaps.alt.cfrplus.pdf",
+          "sha256": "3be6c63fb638298167c4ffb90b47eddc1028601e26bd37f8e6945c5578332283",
+          "bytes": 102768
+        },
+        {
+          "source_path": "results/results_pbce/fixed/pefr.CSPS-EFR.round.gaps.alt.cfrplus.pdf",
+          "sha256": "e75e10e80e3d46d883750b2ad7c6ac89b1a8ce6bd33620756e900c831dea38ec",
+          "bytes": 101668
+        },
+        {
+          "source_path": "results/results_pbce/adaptive/pefr.A-EFR_IN.adaptive.gaps.pdf",
+          "sha256": "fb029ed7b155096e60c45694ac0215c24925e34202d1081c4b5236c034e79f46",
+          "bytes": 109517
+        },
+        {
+          "source_path": "results/results_pbce/adaptive/pefr.CFPS-EFR.adaptive.gaps.pdf",
+          "sha256": "365c304f45102b33382248e2beb94ca7c71473ee34f3fddd4d8a8ff84c1e4ede",
+          "bytes": 143405
+        },
+        {
+          "source_path": "results/results_pbce/adaptive/pefr.CFR.adaptive.gaps.pdf",
+          "sha256": "c27c7f5989ca3495341174f5035f011bf2e7d6b8c47ac2e61641b6772cdd8be0",
+          "bytes": 142699
+        },
+        {
+          "source_path": "results/results_pbce/adaptive/pefr.CFR_IN.adaptive.gaps.pdf",
+          "sha256": "1298edd71ae7373574da5e05df297119e67574153d0a6c0bfe77721c28b0ce0a",
+          "bytes": 141921
+        },
+        {
+          "source_path": "results/results_pbce/adaptive/pefr.CSPS-EFR.adaptive.gaps.pdf",
+          "sha256": "bb5bddaa08a70ebc925fb825bb6048cd0e132ed0003426f01b4df45ef5b4ac4c",
+          "bytes": 139575
+        }
+      ]
+    }
+  }
+}

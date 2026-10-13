@@ -1,4 +1,7 @@
-# Extraction review
+# Historical extraction review (2026-09-22)
+
+This records the original extraction. The 2026-10-13 release now includes the
+curated dataset and plotting pipeline; see ../VALIDATION.md and IMPLEMENTATION_STATUS.md.
 
 This snapshot was extracted on 2026-09-22. See `source_manifest.json` for the
 original source revision, dependency versions, and original-file digests.

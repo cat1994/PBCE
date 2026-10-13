@@ -40,6 +40,8 @@ ABSL_FLAG(int32_t, random_seed, 0, "Seed for a sampler's random engine.");
 ABSL_FLAG(bool, show_num, false, "Only show the number of algorithms.");
 ABSL_FLAG(size_t, alg_group, 3, "Algorithm group (only PBCE group 3 is supported).");
 ABSL_FLAG(double, epsilon, 0.0, "Fixed perturbation parameter.");
+ABSL_FLAG(bool, legacy_algorithm_mapping, false,
+          "Replay archived correlated_eq CFR/CFR_IN mappings instead of paper CF/CF-IN.");
 ABSL_FLAG(int32_t, threads, 1, "Number of algorithms to run concurrently.");
 ABSL_FLAG(std::string, file_dir, "data/test_results.ssv", "Result file.");
 ABSL_FLAG(bool, alt, true, "Use alternate/Gauss-Seidel updates.");
@@ -707,11 +709,17 @@ bool run_experiment() {
   const bool adaptive = absl::GetFlag(FLAGS_adaptive_epsilon);
   const double initial_epsilon =
       adaptive ? absl::GetFlag(FLAGS_epsilon_init) : absl::GetFlag(FLAGS_epsilon);
-  const auto labeled_algs = ltbr_perturbed_cfr_algs(initial_epsilon);
+  const bool legacy_algorithm_mapping = absl::GetFlag(FLAGS_legacy_algorithm_mapping);
+  const auto labeled_algs =
+      ltbr_perturbed_cfr_algs(initial_epsilon, legacy_algorithm_mapping);
   const auto alg_labels = LearnerProfileLabels(labeled_algs);
   if (absl::GetFlag(FLAGS_show_num)) {
     std::cout << alg_labels.size() << '\n';
     return true;
+  }
+
+  if (legacy_algorithm_mapping) {
+    std::cout << "Algorithm mapping: legacy correlated_eq (CFR/CFR_IN are historical labels).\n";
   }
 
   hr_edl::CachedDecisionPoint root(game->NewInitialState(), false, true);

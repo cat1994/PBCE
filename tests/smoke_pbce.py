@@ -19,10 +19,10 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from pbce.experiments import GAME_MAP
+from pbce.experiments import GAME_MAP, PBCE_ALGORITHMS
 
-ALGORITHMS = {"A-EFR_IN", "CSPS-EFR", "CFPS-EFR", "CFR", "CFR_IN"}
-REFERENCE_ALGORITHMS = ALGORITHMS - {"CFR", "CFR_IN"}
+ALGORITHMS = PBCE_ALGORITHMS
+# ACSR and normalized fields are checked only as historical output diagnostics.
 METRICS = (
     "posr", "osr", "csr", "acsr", "posr_norm", "osr_norm", "csr_norm",
     "w_min", "w_min_positive", "w_mean", "w_max", "w_at_max_csr",
@@ -36,6 +36,7 @@ ADAPTIVE_FLAGS = [
 ]
 EXE = None
 REFERENCE_EXE = None
+HISTORICAL_REFERENCE = False
 
 
 class PbceSmokeTests(unittest.TestCase):
@@ -215,30 +216,31 @@ class PbceSmokeTests(unittest.TestCase):
             with self.subTest(flags=flags):
                 self.run_experiment(flags, success=False)
 
-    def test_optional_reference_equivalence_for_unchanged_algorithms(self):
+    def test_optional_reference_equivalence(self):
         if REFERENCE_EXE is None:
             self.skipTest("No reference executable supplied")
+        actual_flags = ["--legacy_algorithm_mapping=true"] if HISTORICAL_REFERENCE else []
         for flags in ([], ["--alt=false", "--cfr_plus=false"]):
             with self.subTest(flags=flags):
-                actual_output, _ = self.run_experiment(flags)
+                actual_output, _ = self.run_experiment([*flags, *actual_flags])
                 reference_output, _ = self.run_experiment(flags, executable=REFERENCE_EXE)
                 actual = self.fixed_records(actual_output)
                 expected = self.fixed_records(reference_output)
                 for iteration in actual:
-                    for algorithm in REFERENCE_ALGORITHMS:
+                    for algorithm in ALGORITHMS:
                         for index in (0, 2, 3, 4, 5):
                             self.assert_numerically_equal(
                                 actual[iteration][algorithm][index], expected[iteration][algorithm][index]
                             )
-        actual_output, _ = self.run_experiment(ADAPTIVE_FLAGS)
+        actual_output, _ = self.run_experiment([*ADAPTIVE_FLAGS, *actual_flags])
         reference_output, _ = self.run_experiment(ADAPTIVE_FLAGS, executable=REFERENCE_EXE)
         actual = [
             row for row in self.adaptive_records(actual_output)
-            if row["algorithm"] in REFERENCE_ALGORITHMS
+            if row["algorithm"] in ALGORITHMS
         ]
         expected = [
             row for row in self.adaptive_records(reference_output)
-            if row["algorithm"] in REFERENCE_ALGORITHMS
+            if row["algorithm"] in ALGORITHMS
         ]
         self.assertEqual(len(actual), len(expected))
         for row, reference in zip(actual, expected):
@@ -256,7 +258,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--exe", type=Path, required=True)
     parser.add_argument("--reference-exe", type=Path)
+    parser.add_argument(
+        "--historical-reference", action="store_true",
+        help="Compare all five historical algorithms with a correlated_eq reference executable.",
+    )
     args = parser.parse_args()
+    if args.historical_reference and args.reference_exe is None:
+        parser.error("--historical-reference requires --reference-exe")
+    HISTORICAL_REFERENCE = args.historical_reference
     EXE = args.exe.resolve()
     REFERENCE_EXE = args.reference_exe.resolve() if args.reference_exe else None
     for executable in (EXE, REFERENCE_EXE):

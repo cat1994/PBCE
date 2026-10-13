@@ -3,10 +3,13 @@
 
 import argparse
 import csv
+import hashlib
+import json
 import math
 import os
 import re
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -29,7 +32,14 @@ from pbce.experiments import (
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dir", dest="data_dir", default="data", help="Output directory.")
+    parser.add_argument(
+        "--dir", dest="data_dir", default="outputs/runs",
+        help="Run output directory, relative to this repository (default: outputs/runs).",
+    )
+    parser.add_argument(
+        "--overwrite", action="store_true",
+        help="Replace results, metadata, logs, temporary files, and policy histories for the requested runs.",
+    )
     parser.add_argument("--exe-dir", default="build/bin", help="Directory with the C++ executable.")
     parser.add_argument("--mode", choices=("fixed", "adaptive", "both"), default="both")
     parser.add_argument("--games", nargs="+", default=list(DEFAULT_GAMES), choices=sorted(GAME_MAP))
@@ -45,6 +55,10 @@ def parse_args(argv=None):
     )
     parser.add_argument("--alt", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--cfr-plus", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument(
+        "--legacy-algorithm-mapping", action=argparse.BooleanOptionalAction, default=False,
+        help="Replay the historical CF/CF-IN implementations used by the bundled data; see docs/IMPLEMENTATION_STATUS.md.",
+    )
     parser.add_argument("--epsilon-init", type=float, default=0.1)
     parser.add_argument("--epsilon-decay", type=float, default=0.5)
     parser.add_argument("--epsilon-min", type=float, default=1e-10)
@@ -111,18 +125,23 @@ class Run:
 
 def build_runs(args):
     """Construct commands; relative paths are resolved against this repository."""
-    executable = PROJECT_ROOT / args.exe_dir / "run_simultaneous_ltbr_pbce"
+    output_directory = (PROJECT_ROOT / args.data_dir).resolve()
+    bundled_data = (PROJECT_ROOT / "data").resolve()
+    if output_directory == bundled_data or bundled_data in output_directory.parents:
+        raise ValueError("The bundled data directory is read-only for the launcher; choose --dir outputs/runs.")
+    executable = (PROJECT_ROOT / args.exe_dir / "run_simultaneous_ltbr_pbce").resolve()
     runs = []
     modes = (False, True) if args.mode == "both" else (args.mode == "adaptive",)
     for adaptive in modes:
         for game in args.games:
             for parameter in (("adaptive",) if adaptive else FIXED_EPSILONS):
-                output = PROJECT_ROOT / args.data_dir / f"pefr.{game}.null.sim.gen.{parameter}.ssv"
+                output = output_directory / f"pefr.{game}.null.sim.gen.{parameter}.ssv"
                 iterations = args.iterations if args.iterations is not None else NUM_ITERATIONS_MAP[game]
                 command = [
                     str(executable), f"--game={GAME_MAP[game]}", "--sampler=null", "--alg_group=3",
                     f"--t={iterations}", f"--threads={args.threads_per_run}", f"--file_dir={output}",
                     f"--alt={bool_flag(args.alt)}", f"--cfr_plus={bool_flag(args.cfr_plus)}",
+                    f"--legacy_algorithm_mapping={bool_flag(args.legacy_algorithm_mapping)}",
                     "--verbose_iteration_log=false", f"--iteration_log_interval={args.iteration_log_interval}",
                     f"--adaptive_epsilon={bool_flag(adaptive)}",
                 ]
@@ -175,9 +194,14 @@ def validate_fixed(file, iterations):
 
 def validate_adaptive(file, iterations):
     reader = csv.DictReader(file)
-    required = {"record_type", "algorithm", "global_t", "epsilon", "epsilon_stage", "stage_t", "status"}
+    required = {
+        "record_type", "algorithm", "global_t", "epsilon", "epsilon_stage", "stage_t", "status",
+        "posr", "osr", "csr",
+    }
     if not required.issubset(reader.fieldnames or []):
         return False, "missing adaptive columns"
+    if len(reader.fieldnames) != len(set(reader.fieldnames)):
+        return False, "duplicate adaptive columns"
     ended = set()
     last_iteration = dict.fromkeys(PBCE_ALGORITHMS, 0)
     final_statuses = {"CERTIFIED_FINAL", "FINAL_NOT_CERTIFIED", "MAX_GLOBAL_ITER", "STAGE_TIMEOUT"}
@@ -193,8 +217,10 @@ def validate_adaptive(file, iterations):
         iteration, epsilon = int(row["global_t"]), float(row["epsilon"])
         if not last_iteration[algorithm] <= iteration <= iterations:
             return False, "invalid adaptive iteration"
-        if int(row["stage_t"]) < 0 or int(row["epsilon_stage"]) < 0:
-            return False, "negative adaptive stage or iteration"
+        if not 0 <= int(row["stage_t"]) <= iteration or int(row["epsilon_stage"]) < 0:
+            return False, "invalid adaptive stage or iteration"
+        if not all(math.isfinite(float(row[field])) for field in ("posr", "osr", "csr")):
+            return False, "non-finite adaptive metrics"
         if not math.isfinite(epsilon) or epsilon < 0:
             return False, "invalid adaptive epsilon"
         last_iteration[algorithm] = iteration
@@ -218,12 +244,64 @@ def validate_output(output, adaptive, iterations):
         return False, f"unreadable or malformed result: {error}"
 
 
-def file_signature(path):
-    try:
-        stat = path.stat()
-        return stat.st_ino, stat.st_size, stat.st_mtime_ns
-    except FileNotFoundError:
-        return None
+def run_artifacts(run):
+    """Only these exact, per-run paths are eligible for explicit replacement."""
+    return (
+        run.output, run.output.with_suffix(".log"), Path(str(run.output) + ".tmp"),
+        run.output.with_suffix(".metadata.json"),
+        Path(str(run.output) + ".policies"),
+    )
+
+
+def check_output_paths(runs, overwrite):
+    """Check the entire matrix before starting work or replacing any results."""
+    for run in runs:
+        for path in run_artifacts(run):
+            if path.is_symlink():
+                raise ValueError(f"Refusing to replace a symbolic link: {path}")
+            if path.exists() and not overwrite:
+                raise ValueError(f"Output already exists: {path}. Choose another --dir or pass --overwrite.")
+            if path.exists() and path.is_dir() and path != run_artifacts(run)[-1]:
+                raise ValueError(f"Expected a file, found a directory: {path}")
+
+
+def remove_run_artifacts(run):
+    for path in run_artifacts(run):
+        if path.is_dir():
+            shutil.rmtree(path)
+        else:
+            path.unlink(missing_ok=True)
+
+
+def executable_sha256(executable):
+    digest = hashlib.sha256()
+    with executable.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def write_run_metadata(run, args, digest):
+    """Save launch provenance; successful completion is checked separately."""
+    metadata = {
+        "schema_version": 1,
+        "started_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "command": run.command,
+        "working_directory": str(PROJECT_ROOT),
+        "executable_sha256": digest,
+        "mode": "adaptive" if run.adaptive else "fixed",
+        "game": run.game,
+        "parameter": run.parameter,
+        "iterations": run.iterations,
+        "algorithm_labels": sorted(PBCE_ALGORITHMS),
+        "legacy_algorithm_mapping": args.legacy_algorithm_mapping,
+        "launcher_options": vars(args),
+    }
+    # Exclusive creation also prevents concurrent launchers from silently sharing
+    # an output name when neither requested explicit replacement.
+    with run.output.with_suffix(".metadata.json").open("x", encoding="utf-8") as stream:
+        json.dump(metadata, stream, indent=2)
+        stream.write("\n")
 
 
 def stop_children(children):
@@ -256,14 +334,28 @@ def stop_children(children):
 
 def main(argv=None):
     args = parse_args(argv)
-    pending = deque(build_runs(args))
+    try:
+        pending = deque(build_runs(args))
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 1
     if args.dry_run:
         for run in pending:
             print(shlex.join(run.command))
         return 0
+    try:
+        check_output_paths(pending, args.overwrite)
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 1
     executable = Path(pending[0].command[0])
     if not executable.is_file() or not os.access(executable, os.X_OK):
         print(f"Executable not found or not executable: {executable}. Build the C++ target first.", file=sys.stderr)
+        return 1
+    try:
+        digest = executable_sha256(executable)
+    except OSError as error:
+        print(f"Cannot read executable: {error}", file=sys.stderr)
         return 1
     print("start time:", datetime.now(timezone.utc).isoformat(timespec="seconds"), flush=True)
     running, children, failures = [], [], 0
@@ -279,7 +371,9 @@ def main(argv=None):
             while pending and len(running) < args.max_parallel_jobs:
                 run = pending.popleft()
                 run.output.parent.mkdir(parents=True, exist_ok=True)
-                previous = file_signature(run.output)
+                if args.overwrite:
+                    remove_run_artifacts(run)
+                write_run_metadata(run, args, digest)
                 log = run.output.with_suffix(".log").open("w", encoding="utf-8")
                 print(f"[RUN] game={run.game} parameter={run.parameter}", flush=True)
                 try:
@@ -291,17 +385,15 @@ def main(argv=None):
                     log.close()
                     raise
                 children.append((process, log))
-                running.append((process, log, run, previous))
+                running.append((process, log, run))
             still_running = []
-            for process, log, run, previous in running:
+            for process, log, run in running:
                 return_code = process.poll()
                 if return_code is None:
-                    still_running.append((process, log, run, previous))
+                    still_running.append((process, log, run))
                     continue
                 log.close()
                 valid, reason = validate_output(run.output, run.adaptive, run.iterations)
-                if previous is not None and file_signature(run.output) == previous:
-                    valid, reason = False, "result was not replaced by this run"
                 if return_code != 0 or not valid:
                     failures += 1
                     print(f"[FAIL] game={run.game} parameter={run.parameter} exit={return_code} {reason}", flush=True)

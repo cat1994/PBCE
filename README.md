@@ -1,148 +1,127 @@
-# PBCE experiments
+# PBCE / PEFR: code and experimental data
 
-This repository contains the code needed to run the fixed-epsilon PBCE experiments and the stagewise adaptive PEFR controller extracted from the original experimental workspace. It includes the C++ runner, its shared learner and evaluation code, the required game implementations, a Python batch launcher, and regression tests.
+This standalone package contains the PBCE experiment runner, the five-game
+dataset used in the manuscript figures, and a script that redraws all ten
+fixed/adaptive figures. Dependencies for the C++ build are vendored; no source
+checkout, submodule fetch, notebook or pickled NumPy dataset is required.
 
-Intended GitHub publication target: [cat1994/PBCE](https://github.com/cat1994/PBCE).
+**Implementation status.** The bundled data reproduce the historical numerical
+experiments. The current manuscript's intended-device and full-continuation
+definitions are not fully implemented by the inherited learner/evaluator.
+There are also two documented historical algorithm-label mappings. These are
+material scientific differences, recorded in
+[docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md); successful tests
+and figure reproduction do not resolve them.
+
+## Reproduce the figures from bundled data
+
+Use Python 3.10 or newer. From the repository root:
+
+```sh
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r requirements-plot.txt
+python3 scripts/verify_release.py
+python3 bin/plot_PBCE.py
+```
+
+The final command writes five fixed and five adaptive PDFs to
+`outputs/figures/{fixed,adaptive}/`, with the filenames referenced by the paper.
+It also writes `plot_manifest.json` with input hashes, sampling settings and
+adaptive terminal statuses. No C++ compilation is needed to redraw the data.
+
+```sh
+# PDF and PNG; accept either original output labels or paper labels.
+python3 bin/plot_PBCE.py --formats pdf png
+python3 bin/plot_PBCE.py --mode adaptive --algorithms CSPS CF
+# Exact raw records with no fixed-curve subsampling:
+python3 bin/plot_PBCE.py --mode fixed --fixed-stride 1 --max-points 0
+# Inspect a new experiment directory (plain .ssv and compressed .ssv.gz work):
+python3 bin/plot_PBCE.py --fixed-data outputs/runs --adaptive-data outputs/runs
+```
+
+Defaults match the paper's fixed-curve sampling: first retain rounds with
+`t=0,100,...,99900`, then select 100 equally spaced indices and plot `t+1`.
+The last plotted round is 99,901; the archive still includes all 100,000
+records. Adaptive plots use all `CHECKPOINT` rows, mark stage transitions and
+annotate the terminal epsilon. `--disconnect-stages` breaks curves at stage
+boundaries. Nonpositive values are masked on logarithmic axes, never replaced
+in the dataset. ACSR and utility-range-normalized columns are not plotted.
+
+The identical script in the parent `correlated_eq` project automatically uses
+`data_pbce/` for fixed records and `data_pbce/data_pbce_gamma0d5/` for adaptive
+records. Explicit `--fixed-data`, `--adaptive-data` or `--data-dir` paths override
+these defaults. Relative paths are resolved against the script's repository.
 
 ## Build and test
 
-Requirements:
-
-- A C++17 compiler and a C++ standard library with filesystem support.
-- CMake 3.16 or newer and a supported build tool, such as Make or Ninja.
-- Python 3.9 or newer for the experiment launcher and its tests.
-- A POSIX environment such as Linux for the documented process-management workflow.
-
-The required OpenSpiel source subset, Abseil, and Eigen headers are included. Configuration and compilation do not download dependencies, and the Python launcher uses only the standard library. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for provenance and licenses.
-
-From the repository root, use the provided Makefile for incremental builds:
+Requirements: a C++17 compiler, CMake 3.16+, a POSIX environment and Python
+3.10+. Matplotlib is optional for running simulations and unit tests.
 
 ```sh
-make pbce          # Build only the experiment executable.
-make               # Build the executable and test programs.
-make test          # Build and run all tests.
+make JOBS=4
+make test
+python3 scripts/verify_release.py --full
 ```
 
-Set `JOBS` to change build parallelism. A separate directory keeps a debug
-configuration independent from the release build:
-
-```sh
-make pbce JOBS=8
-make BUILD_DIR=build-debug BUILD_TYPE=Debug
-```
-
-The Makefile invokes CMake. The equivalent commands are:
-
-```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --parallel 4
-(cd build && ctest --output-on-failure)
-```
-
-The experiment executable is `build/bin/run_simultaneous_ltbr_pbce`. CTest runs the C++ regression tests and Python launcher checks. To run the Python checks independently:
-
-```sh
-python3 -B -m unittest discover -s tests -v
-```
+The executable is `build/bin/run_simultaneous_ltbr_pbce`. OpenSpiel, Abseil and
+the required Eigen headers/licenses are included; configuration does not
+download dependencies. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Run experiments
 
-The batch launcher supports `fixed`, `adaptive`, and `both` modes. All examples below write results and per-run logs under `data/`. Paths passed to `--dir` and `--exe-dir` are resolved relative to the repository root; absolute paths are also accepted.
+```sh
+# Fast pipeline check: six fixed epsilon values and one adaptive run.
+python3 bin/run_all_pbce.py --games kuhn_2p --iterations 20 \
+  --checkpoint-freq 5 --max-parallel-jobs 2 --dir outputs/smoke
 
-Start with a small two-player Kuhn poker run covering both modes:
+# Inspect the paper's 35-run matrix before running it.
+python3 bin/run_all_pbce.py --legacy-algorithm-mapping --dry-run
+
+# Re-run the historical five-game experiment configuration.
+python3 bin/run_all_pbce.py --legacy-algorithm-mapping \
+  --max-parallel-jobs 2 --threads-per-run 1 --dir outputs/historical
+```
+
+Defaults select Kuhn (3 players), Leduc (2), random-prize Goofspiel (2 players,
+4 cards), Sheriff and Tiny Bridge; alternate CFR+ updates; 100,000 iterations;
+fixed epsilon `0.1, 0.05, 0.01, 0.005, 0.001, 0`; adaptive initial epsilon `0.1`,
+decay `0.5` and minimum `1e-10`. `kuhn_2p` is retained for regression checks.
+Use `--help` for all controller and scheduling parameters.
+
+Without `--legacy-algorithm-mapping`, `CFR` and `CFR_IN` use the standalone
+repository's corrected immediate external/internal predecessor classes.
+The historical switch restores the two predecessor classes used to produce
+the bundled data; it does not fix the separate manuscript/implementation
+differences. See the mapping table in the implementation status document.
+
+New runs default to `outputs/runs/`. Each run writes results, a log and a JSON
+metadata file containing the command, options and executable SHA-256. Existing
+outputs are protected; use `--overwrite` only to replace that run's outputs.
+The launcher refuses to write inside the bundled `data/` directory.
+
+Fixed mode preserves the historical convention: `T` records, indexed
+`t=0,...,T-1`, include `T-1` learner updates and a final evaluation. Adaptive
+mode performs at most `T` updates. Process completion is separate from final
+stage certification; `MAX_GLOBAL_ITER`, `STAGE_TIMEOUT` and
+`FINAL_NOT_CERTIFIED` remain valid completed runs without final certification.
+
+## Dataset and release
+
+[data/README.md](data/README.md) describes the 35 losslessly compressed raw
+files (about 167 MiB; 948 MiB decompressed), their schemas, sources and the
+verification against the paper's intermediate data and ten PDF figures.
+[data/manifest.json](data/manifest.json) records compressed and raw hashes,
+record counts, settings and provenance. No experiment rerun is needed to use it.
 
 ```sh
-python3 bin/run_all_pbce.py \
-  --mode both --games kuhn_2p --iterations 20 \
-  --checkpoint-freq 5 --max-parallel-jobs 2 --threads-per-run 1 \
-  --dir data/smoke
+make figures       # Redraw the ten paper figures.
+make verify        # Check every distributed file and decompress/hash raw data.
+make release       # Export the verified source+data ZIP to dist/.
 ```
 
-This starts six fixed-epsilon jobs and one adaptive job. Each job runs the five algorithms listed below. The small iteration budget checks that the executable and output pipeline work; it does not establish convergence.
-
-Run either experiment family separately:
-
-```sh
-python3 bin/run_all_pbce.py \
-  --mode fixed --games kuhn_2p --iterations 1000 \
-  --max-parallel-jobs 2 --threads-per-run 1 --dir data/fixed
-
-python3 bin/run_all_pbce.py \
-  --mode adaptive --games kuhn_2p --iterations 1000 \
-  --checkpoint-freq 50 --max-parallel-jobs 1 --threads-per-run 1 \
-  --dir data/adaptive
-```
-
-For the larger experiment suite:
-
-```sh
-python3 bin/run_all_pbce.py \
-  --mode both \
-  --games kuhn_3p leduc random_goofspiel goofspiel_3p \
-          goofspiel_ascending_3p sheriff tiny_bridge battleship \
-  --iterations 100000 --max-parallel-jobs 2 --threads-per-run 5 \
-  --iteration-log-interval 1000 --dir data/experiments
-```
-
-Game trees vary substantially in size. Set `--max-parallel-jobs` to limit concurrent game/epsilon jobs and `--threads-per-run` to limit concurrent algorithms within each job. Run `--dry-run` to inspect commands without starting jobs or creating output directories:
-
-```sh
-python3 bin/run_all_pbce.py --mode both --games kuhn_2p --dry-run
-python3 bin/run_all_pbce.py --help
-```
-
-With no options, the launcher selects `kuhn_3p`, both modes, 100,000 iterations, at most six concurrent jobs, one algorithm thread per job, and `build/bin` as the executable directory. Alternate updates and CFR+ truncation are enabled; `--no-alt` and `--no-cfr-plus` disable them.
-
-The fixed sweep uses epsilon values `1e-1`, `5e-2`, `1e-2`, `5e-3`, `1e-3`, and `0`. Adaptive defaults include initial epsilon `0.1`, decay `0.5`, minimum epsilon `1e-10`, and checkpoint frequency `50`; `--help` lists the controller options. The C++ runner checks that the chosen epsilon is feasible for the game's action counts.
-
-The historical iteration conventions are preserved: fixed mode with `--iterations T` writes `T` records per algorithm, indexed `t = 0, ..., T-1`, with `T-1` learner updates and a final evaluation. Adaptive mode performs at most `T` updates and may terminate earlier. Equal iteration arguments therefore use these respective conventions.
-
-## Games and algorithm labels
-
-[pbce/experiments.py](pbce/experiments.py) defines the available game tags and exact parameters:
-
-- `kuhn_2p`, `kuhn_3p`, `kuhn_4p`, `leduc`, and `leduc_3p`.
-- `goofspiel`, `goofspiel_ascending`, `random_goofspiel`, `goofspiel_3p`, and `goofspiel_ascending_3p`.
-- `sheriff`, `tiny_bridge`, `tiny_hanabi`, and `battleship`.
-- `shapley` and `test_game`, loaded from the bundled files in `games/efg/`.
-
-`leduc_3p` uses the bundled Leduc game's standard raise sizes of 2 and 4.
-The original configuration's `raise_sizes=[1]` argument was unsupported by this
-OpenSpiel version and prevented the game from loading; it has been removed.
-
-The executable supports PBCE algorithm group `3`. Its output labels and exact predecessor classes are defined in [src/bin/ltbr.h](src/bin/ltbr.h):
-
-| Output label | Predecessor class |
-| --- | --- |
-| `A-EFR_IN` | `InformedActionSequencePredecessors` |
-| `CSPS-EFR` | `CausalPartialSequencePredecessors` |
-| `CFPS-EFR` | `CounterfactualPartialSequencePredecessors` |
-| `CFR` | `ImmediateExternalSequencePredecessors` |
-| `CFR_IN` | `ImmediateInternalSequencePredecessors` |
-
-Each is instantiated through `BehavioralDeviationTabularCfvLearner` and wrapped by `PerturbedCfTreeLearnerProfile`. `CFR` uses immediate external deviations, while `CFR_IN` uses immediate internal deviations. These mappings differ from the original extracted snapshot and can change their numerical results; use the table above when comparing runs or documenting methods.
-
-## Results and completion checks
-
-Result filenames retain the original convention:
-
-```text
-pefr.<game>.null.sim.gen.<epsilon>.ssv
-pefr.<game>.null.sim.gen.adaptive.ssv
-```
-
-Fixed results use the historical space-separated text format: a metric header, a `t = ...` line for each recorded iteration, and one tuple for each algorithm. Adaptive results contain comma-separated CSV despite the `.ssv` suffix. Read adaptive files with a CSV reader and use fields such as `record_type`, `algorithm`, `global_t`, `epsilon_stage`, `stage_t`, `epsilon`, and `status`.
-
-Each job has a matching `.log` file containing the executable's stdout and stderr. Adding `--save-stage-policies` to an adaptive run writes JSONL files under `<result>.ssv.policies/`; these contain metadata and per-iteration policy profiles. Files from an uncertified stage receive an additional `.partial` suffix. Serializing policies can produce large outputs.
-
-The launcher checks the process exit status, all five algorithms, every requested fixed record, and one valid adaptive `RUN_END` per algorithm. It rejects malformed or incomplete results and previously existing result files that the new run did not replace. A failed batch exits with a nonzero status. On interruption, the launcher terminates and waits for its running subprocesses.
-
-A completed adaptive job can end with `MAX_GLOBAL_ITER`, `STAGE_TIMEOUT`, or `FINAL_NOT_CERTIFIED`; these indicate a completed run without final controller certification. `CERTIFIED_FINAL` means the implemented controller's final-stage conditions were satisfied. Successful process completion and valid output alone do not establish certified convergence. `NUMERICAL_ERROR` and `PROCESS_ERROR` are failures.
-
-Use separate output directories for configurations you want to compare: filenames encode the game and epsilon mode, while options such as update order, CFR+, and adaptive thresholds are supplied on the command line. Repeating a successful run with the same filename replaces its result and log.
-
-## Repository scope
-
-The extraction excludes historical result data, notebooks, plotting environments, build artifacts, and unrelated general EFR/QBCE executable entry points. Shared learner, regret, and evaluation implementations are retained where needed by the PBCE dependency chain, including shared definitions whose names also appear in other experiment families. This preserves the original implementation semantics while limiting the exposed experiment interface to PBCE.
-
-Project comments and documentation are in English. Third-party source and license notices are retained; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+The export excludes Git/IDE metadata, builds, local outputs, logs and unrelated
+experiments. `SHA256SUMS` covers its complete source/data inventory.
+[VALIDATION.md](VALIDATION.md) records what was tested and the remaining scope.
+The original MIT license is preserved in [LICENSE.txt](LICENSE.txt); third-party
+code retains its own notices and licenses.

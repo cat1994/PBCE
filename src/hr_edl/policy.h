@@ -52,7 +52,7 @@ ActionsAndProbsTable(const open_spiel::Game& game, const Policy& policy) {
   ForEachState(*(game.NewInitialState()),
                [&map, &policy](const open_spiel::State& state) {
                  const auto iss = state.InformationStateString();
-                 if (!Contains(map, iss)) {
+                 if (map.find(iss) == map.end()) {
                    map[iss] = policy.GetStatePolicy(state);
                  }
                });
@@ -68,7 +68,7 @@ ActionsAndProbsTable(DecisionPoint& root, const Policy& policy) {
       root,
       [&map, &policy](const DecisionPoint& dp) {
         const auto iss = dp.InformationStateString();
-        if (!Contains(map, iss)) {
+        if (map.find(iss) == map.end()) {
           map[iss] = policy.GetStatePolicy(*dp.OpenSpielStatePtr());
         }
       },

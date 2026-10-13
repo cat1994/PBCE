@@ -73,6 +73,9 @@ if(BUILD_TESTING)
     src/open_spiel/algorithms/expected_returns.cc
     src/open_spiel/algorithms/history_tree.cc
   )
+  add_executable(pbce_core_test tests/pbce_core_test.cc)
+  target_link_libraries(pbce_core_test PRIVATE pbce_core)
+  add_test(NAME pbce_core_invariants COMMAND pbce_core_test)
   find_package(Python3 3.9 COMPONENTS Interpreter REQUIRED)
   add_test(NAME python_runner
     COMMAND ${Python3_EXECUTABLE} -m unittest discover -s tests -p test_*.py)

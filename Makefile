@@ -3,9 +3,9 @@ BUILD_TYPE ?= Release
 JOBS ?= 4
 CMAKE ?= cmake
 CTEST ?= ctest
+PYTHON ?= python3
 
-.PHONY: all configure build pbce test clean rebuild help
-
+.PHONY: all configure build pbce test figures verify release help
 all: build
 
 configure:
@@ -15,22 +15,23 @@ build: configure
 	$(CMAKE) --build $(BUILD_DIR) --parallel $(JOBS)
 
 pbce: configure
-	$(CMAKE) --build $(BUILD_DIR) --parallel $(JOBS) \
-		--target run_simultaneous_ltbr_pbce
+	$(CMAKE) --build $(BUILD_DIR) --parallel $(JOBS) --target run_simultaneous_ltbr_pbce
 
 test: build
 	$(CTEST) --test-dir $(BUILD_DIR) --output-on-failure
 
-clean:
-	$(CMAKE) -E remove_directory $(BUILD_DIR)
+figures:
+	$(PYTHON) bin/plot_PBCE.py
 
-rebuild: clean build
+verify:
+	$(PYTHON) scripts/verify_release.py
+
+release:
+	$(PYTHON) scripts/export_release.py
 
 help:
-	@echo "make              Configure and incrementally build all targets"
-	@echo "make pbce         Build only the PBCE experiment executable"
-	@echo "make test         Build and run all tests"
-	@echo "make clean        Remove the selected build directory"
-	@echo "make rebuild      Clean and rebuild all targets"
-	@echo "make JOBS=8       Build with eight parallel jobs"
-	@echo "make BUILD_DIR=build-debug BUILD_TYPE=Debug"
+	@echo "make [JOBS=4]    Build the standalone runner and tests"
+	@echo "make test        Run C++ tests, Python tests and integration smoke"
+	@echo "make figures     Redraw fixed/adaptive paper figures from bundled data"
+	@echo "make verify      Verify source and lossless raw-data checksums"
+	@echo "make release     Export the verified source/data release ZIP"

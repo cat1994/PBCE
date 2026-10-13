@@ -4,12 +4,7 @@ This standalone repository contains the PBCE experiment runner, the five-game
 historical dataset, and the plotting pipeline. C++ dependencies are vendored;
 no parent-project checkout, submodule fetch or notebook is required.
 
-The submitted manuscript is unchanged. The current implementation contains
-memory-weight and signed-evaluation corrections; the bundled measurements
-remain historical results, not reruns of this corrected implementation.
-See [implementation status](docs/IMPLEMENTATION_STATUS.md).
-
-## Labels: preserve the data, map the figures
+## Build and test
 
 Generation and processing retain the original five labels:
 `A-EFR_IN`, `CFR`, `CFR_IN`, `CSPS-EFR`, and `CFPS-EFR`.
